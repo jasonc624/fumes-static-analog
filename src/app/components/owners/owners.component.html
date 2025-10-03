@@ -1,0 +1,581 @@
+<div class="owner-container">
+  <div class="blob"></div>
+  <section class="intro">
+    <div class="inner-section">
+      <div class="cta">
+        <h1>
+          Car Rental Software | Easy Fleet Management for...&nbsp;
+          @if(isBrowser) {
+            <om-typewriter
+              [words]="[
+                'Any Business',
+                'Someone Just Starting Out',
+                'Large Scale Operations',
+                'Prudent Entrepreneurs'
+              ]"
+            ></om-typewriter>
+          }
+        </h1>
+
+        <strong>
+          @if(isBrowser) {
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'Cloud Based Fleet Management'"
+            ></om-gradient-text>
+          }
+        </strong>
+        <p style="margin-top: 8px !important">
+          {{ paragraph }}
+        </p>
+
+        <br />
+        <div class="three-benefits hidden left">
+          <ul>
+            <li><mat-icon>verified</mat-icon> <span>Free To Access</span></li>
+            <li>
+              <mat-icon>verified</mat-icon>
+              <span>No Sales Rep Required</span>
+            </li>
+            <li>
+              <mat-icon>verified</mat-icon>
+              <span>No Startup Costs</span>
+            </li>
+          </ul>
+        </div>
+
+        <br />
+        <button
+          mat-fab
+          extended
+          color="accent"
+          appTrackClick="get_started_click"
+          [routerLink]="['/', 'register']"
+          routerLinkActive="router-link-active"
+        >
+          <mat-icon>auto_awesome</mat-icon>
+          Start Here
+        </button>
+
+        <span class="noccreq"> No Credit Card Required </span>
+      </div>
+      <div class="image">
+        <img
+          alt="Isomorphic image"
+          title="Isomorphic image of 3 platforms where user is managing their business"
+          [src]="_Images?.landing?.owner?.hero"
+          alt="hero image"
+        />
+      </div>
+    </div>
+  </section>
+  <section class="all-inclusive">
+    <div style="margin-top: 48px" class="inner-section center">
+      <h2>No Cap, We're Serious</h2>
+      <p style="line-height: 1.8">
+        No fixed fees, just fair partnership. We take a percentage only when you
+        earn. <br />Slow month? Pay less. Busy season? We both win. <br />
+        Your success is our success—simple as that.
+      </p>
+      <div class="beam-wrapper">
+        <div class="icon white" #RefItem1>
+          <div class="inner-icon">
+            <div class="value">
+              <mat-icon>all_inclusive</mat-icon>
+            </div>
+            @if(isBrowser) {
+              <om-gradient-text
+                gradientStart="#ff0266"
+                gradientEnd="#4ecdc4"
+                [text]="'Cars'"
+              ></om-gradient-text>
+            }
+            <mat-icon>directions_car</mat-icon>
+          </div>
+        </div>
+        <div class="icon white" #RefItem2>
+          <div class="inner-icon">
+            <div class="value">
+              <mat-icon>all_inclusive</mat-icon>
+            </div>
+            @if(isBrowser) {
+              <om-gradient-text
+                gradientStart="#ff0266"
+                gradientEnd="#4ecdc4"
+                [text]="'Users'"
+              ></om-gradient-text>
+            }
+            <mat-icon>groups</mat-icon>
+          </div>
+        </div>
+        <div class="icon white" #RefItem3>
+          <div class="inner-icon">
+            <div class="value">
+              <mat-icon>all_inclusive</mat-icon>
+            </div>
+            @if(isBrowser) {
+              <om-gradient-text
+                gradientStart="#ff0266"
+                gradientEnd="#4ecdc4"
+                [text]="'Integrations'"
+              ></om-gradient-text>
+            }
+            <mat-icon>account_tree</mat-icon>
+          </div>
+        </div>
+        <div class="center">
+          <div class="icon white" #RefCenter>
+            <img
+              [ngSrc]="_Images?.logo_full"
+              width="100"
+              height="100"
+              priority
+              alt="fumes logo"
+            />
+          </div>
+        </div>
+        <div class="icon white" #RefItem4>
+          <div class="inner-icon">
+            <div class="value">
+              <mat-icon>all_inclusive</mat-icon>
+            </div>
+            @if(isBrowser) {
+              <om-gradient-text
+                gradientStart="#ff0266"
+                gradientEnd="#4ecdc4"
+                [text]="'Locations'"
+              ></om-gradient-text>
+            }
+            <mat-icon>maps_home_work</mat-icon>
+          </div>
+        </div>
+        <div class="icon white" #RefItem5>
+          <div class="inner-icon">
+            <div class="value">
+              <mat-icon>all_inclusive</mat-icon>
+            </div>
+            @if(isBrowser) {
+              <om-gradient-text
+                gradientStart="#ff0266"
+                gradientEnd="#4ecdc4"
+                [text]="'E-Signs'"
+              ></om-gradient-text>
+            }
+            <mat-icon>brush</mat-icon>
+          </div>
+        </div>
+        <div class="icon white" #RefItem6>
+          <div class="inner-icon">
+            <div class="value">
+              <mat-icon>all_inclusive</mat-icon>
+            </div>
+            @if(isBrowser) {
+              <om-gradient-text
+                gradientStart="#ff0266"
+                gradientEnd="#4ecdc4"
+                [text]="'Tasks'"
+              ></om-gradient-text>
+            }
+            <mat-icon>task</mat-icon>
+          </div>
+        </div>
+        @if(isBrowser) {
+          <om-connection-beam
+            [fromRef]="RefItem1"
+            [toRef]="RefCenter"
+            [curvature]="-20"
+            [pathWidth]="4"
+          ></om-connection-beam>
+        }
+        @if(isBrowser) {
+          <om-connection-beam
+            [fromRef]="RefItem2"
+            [toRef]="RefCenter"
+            [pathWidth]="4"
+          ></om-connection-beam>
+        }
+        @if(isBrowser) {
+          <om-connection-beam
+            [fromRef]="RefItem3"
+            [toRef]="RefCenter"
+            [curvature]="20"
+            [pathWidth]="4"
+          ></om-connection-beam>
+        }
+        @if(isBrowser) {
+          <om-connection-beam
+            [fromRef]="RefItem4"
+            [toRef]="RefCenter"
+            [reverse]="true"
+            [curvature]="-20"
+            [pathWidth]="4"
+          ></om-connection-beam>
+        }
+        @if(isBrowser) {
+          <om-connection-beam
+            [fromRef]="RefItem5"
+            [toRef]="RefCenter"
+            [reverse]="true"
+            [pathWidth]="4"
+          ></om-connection-beam>
+        }
+        @if(isBrowser) {
+          <om-connection-beam
+            [fromRef]="RefItem6"
+            [toRef]="RefCenter"
+            [reverse]="true"
+            [curvature]="20"
+            [pathWidth]="4"
+          ></om-connection-beam>
+        }
+      
+      </div>
+    </div>
+  </section>
+  <section class="mobile-ui">
+    <div
+      role="image"
+      alt="Image of mobile and laptop demonstrating responsive usage of the app"
+      class="bg-image image left hidden"
+      [ngStyle]="{
+        'background-image': 'url(' + _Images?.landing?.owner?.mock + ')'
+      }"
+    ></div>
+    <div class="callout">
+      <div class="inner-callout hidden">
+        <h2>Mobile Wasn't An After Thought.</h2>
+        <div class="hr">
+          <hr />
+          <mat-icon>phone_iphone</mat-icon>
+        </div>
+        <p>
+          At Fumes, we understand that your car rental business doesn't stop
+          when you're away from your desk. That's why we've designed our
+          platform with a mobile-first approach, ensuring that you can easily
+          manage your rentals, customers, and vehicles from your smartphone or
+          tablet.
+        </p>
+      </div>
+    </div>
+  </section>
+  <section class="sponsor-banner">
+    <div class="marquee-wrapper">
+      @if(isBrowser) {
+        <om-marquee>
+          <div
+            #OmMarqueeContent
+            class="sponsor-logo"
+            *ngFor="let image of _Images?.integrations | keyvalue"
+          >
+            <img width="120" [src]="image?.value" [alt]="image?.key" />
+          </div>
+        </om-marquee>
+      }
+      <div class="marquee-gradient left"></div>
+      <div class="marquee-gradient right"></div>
+    </div>
+  </section>
+  <section class="platform-summary">
+    <div class="inner-section">
+      <h2>A Powerful Toolkit</h2>
+      <p>Built by Car Rental Enthusiasts, for Car Rental Enthusiasts</p>
+
+      <div class="feature-container">
+        @for(feature of highlights; track $index){
+        <div class="feature-box hidden">
+          <div class="icon">
+            <img
+              [alt]="feature.icon"
+              class="svg-image"
+              [src]="_Images?.landing?.owner?.features[feature?.icon]"
+              width="24"
+              height="24"
+            />
+          </div>
+          <div class="words">
+            <div class="title">{{ feature.title }}</div>
+            @if(feature.coming_soon){
+            <span class="coming_soon">Coming Soon</span>
+            }
+            <div class="summary">
+              {{ feature.description }}
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </section>
+  <section class="pricing">
+    <div class="inner-section" style="display: grid; place-items: center">
+      <h2>Pricing</h2>
+      <p>Built to grow around your business</p>
+      <div class="tier-list">
+        @for (tier of tierList; track $index) {
+        @if(isBrowser) {
+          <om-border-beam
+            gradientColorStart="#ff0266"
+            gradientColorEnd="#fff"
+            gradientDirection="to right"
+            borderWidth="2px"
+            borderColor="#fff"
+            class="tier-box hidden left"
+          >
+            <div class="inner-box" (click)="setSlider(tier.value)">
+              <h4>Tier {{ tier.tier }}</h4>
+              <div class="requirements">
+                {{ tier.requirements }}
+              </div>
+              <div class="fee">{{ tier.fee }}%*</div>
+            </div>
+          </om-border-beam>
+        }
+        }
+      </div>
+      <div class="detail-tier">
+        Tier <span>{{ tier }}</span> <br />
+        With a yearly transaction volume of <span>${{ amount }}</span
+        >,<br />
+        the fee rate is <span>{{ percentage }}%</span>. <br />
+        Your cost would be
+        <span> ${{ fee }}</span
+        >** per year.
+      </div>
+      <label style="font-size: 0.9rem" for="transactionSlider">
+        Slide to calculate your projected Fumes fees.
+      </label>
+      <mat-slider
+        style="width: 80%; margin: 0 auto"
+        class="example-margin"
+        [max]="505000"
+        [min]="0"
+        [step]="10000"
+        [discrete]="true"
+        [showTickMarks]="true"
+        (change)="calculateFees(transactionAmount)"
+      >
+        <input
+          id="transactionSlider"
+          matSliderThumb
+          [(ngModel)]="transactionAmount"
+          #slider
+        />
+      </mat-slider>
+      <p>* Subject to change</p>
+      <p>** Does not include Stripe fees.</p>
+    </div>
+  </section>
+  <section id="contact" class="contact">
+    @if(isBrowser) {
+      <om-retro-grid>
+        <div class="inner-section">
+          <div class="center">
+            <h2>
+              @if(isBrowser) {
+                <om-gradient-text
+                  gradientStart="#ff0266"
+                  gradientEnd="#4ecdc4"
+                  [text]="'Lets Talk'"
+                ></om-gradient-text>
+              }
+            </h2>
+
+            @if(isBrowser) {
+              <om-neon-underline
+                middleColor="#60fbf1"
+                sideColor="#4ecdc4"
+              ></om-neon-underline>
+            }
+            <br />
+          </div>
+        @if(!inquirySending) { @if(inquirySuccess){
+        <div class="center success">
+          <img
+            [ngSrc]="_Images?.logo_full"
+            alt="Fumes Logo"
+            width="150"
+            height="150"
+            priority
+          />
+          <h3>Thanks for your message!</h3>
+          <p>We will get back to you shortly.</p>
+        </div>
+        } @else {
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+          <mat-form-field appearance="outline">
+            <mat-label>Name</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="name"
+              placeholder="Enter your name"
+              required
+            />
+          </mat-form-field>
+          <br />
+          <br />
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input
+              matInput
+              type="email"
+              formControlName="email"
+              placeholder="hello@email.com"
+              required
+            />
+          </mat-form-field>
+          <br />
+          <br />
+          <mat-form-field appearance="outline">
+            <mat-label>Fleet Size</mat-label>
+            <mat-select formControlName="fleetSize">
+              <mat-option value="lt5">5 cars or under</mat-option>
+              <mat-option value="gt5lt25">5-25 cars</mat-option>
+              <mat-option value="gt25lt50">25-50 cars</mat-option>
+              <mat-option value="gt50lt100">50-100 cars</mat-option>
+              <mat-option value="gt100">100+ cars</mat-option>
+            </mat-select>
+          </mat-form-field>
+          <br />
+          <br />
+          <mat-form-field appearance="outline">
+            <mat-label>Message</mat-label>
+            <textarea
+              matInput
+              formControlName="message"
+              rows="4"
+              placeholder="Hi, I'm interested in your product, please call me at..."
+              required
+            ></textarea>
+          </mat-form-field>
+          <br />
+          <br />
+          <div class="center">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="contactForm.invalid"
+            >
+              Send Message
+            </button>
+          </div>
+        </form>
+        } } @else {
+        <div class="center loading">
+          <mat-spinner></mat-spinner>
+        </div>
+        }
+      </div>
+    </om-retro-grid>
+    }
+  </section>
+  <ul class="glass">
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+  </ul>
+  <footer class="footer">
+    <footer class="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <a
+              target="_blank"
+              appTrackClick="facebook_group_click"
+              href="https://www.facebook.com/groups/369733679395081"
+              >Join Our Facebook Group</a
+            >
+            <br />
+          </div>
+          <div style="margin-top: 12px" class="col-md-4">
+            <span
+              >Fumes Fleet Utility Management Enhancing System LLC 2023</span
+            >
+          </div>
+          <p>
+            Disclosure: Our software is free to access, which means you can
+            register and login without needing a credit card. All features are
+            readily available for your use. However, please note that we charge
+            a fee for each transaction processed. This fee applies only when you
+            initiate a transaction within the software. We strive to maintain
+            transparency in our pricing, and we will clearly communicate the
+            applicable charges before any transaction takes place. If you have
+            any questions regarding our pricing or billing, please feel free to
+            reach out to our support team for assistance.
+          </p>
+        </div>
+      </div>
+    </footer>
+  </footer>
+</div>
+
+<dialog class="{{ closing ? 'closing' : '' }}" #promo>
+  <div class="inner-dialog">
+    <div class="img-container">
+      <img
+        src="https://utfs.io/f/705b4268-61b7-4bdc-8b80-cdb0839c2cb4-1w0bg.png"
+        alt=""
+      />
+    </div>
+    @if(isBrowser) {
+      <om-border-beam
+        borderRadius="12px"
+        borderWidth="4px"
+        gradientColorStart="#ff0266"
+        gradientColorEnd="#00bac9"
+        borderColor="#fff"
+        class="promo-dialog"
+      >
+        <div class="text">
+          <h2>Save up to $200 a month!</h2>
+          <p>
+            Let us give you a call and we'll get you started on Tier 2
+            immediately.
+          </p>
+          <br />
+          <mat-form-field appearance="outline">
+            <mat-label>10 Digit Phone Number</mat-label>
+            <input
+              matInput
+              [formControl]="phoneCtrl"
+              type="tel"
+              placeholder="123 456 7890"
+            />
+          </mat-form-field>
+          <!-- [error]="
+              !phoneCtrl.touched || phoneCtrl.valid
+                ? null
+                : 'Just 10 digits please'
+            " -->
+          <br />
+          <button
+            mat-raised-button
+            color="primary"
+            type="button"
+            (click)="onPromoSubmit()"
+            [disabled]="phoneCtrl.invalid || inquirySending"
+          >
+            Let's Talk
+          </button>
+        </div>
+      </om-border-beam>
+    }
+    <button
+      class="closeBtn"
+      (focus)="closing = true"
+      (click)="closePromo()"
+      mat-fab
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+</dialog>

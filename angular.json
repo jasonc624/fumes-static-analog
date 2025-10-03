@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "my-app": {
+    "fumes": {
       "projectType": "application",
       "root": ".",
       "sourceRoot": "src",
@@ -50,5 +50,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "17ec42b6-8c4a-4edc-9bd7-2cb818e8c702"
   }
 }

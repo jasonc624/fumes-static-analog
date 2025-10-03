@@ -1,0 +1,45 @@
+  <header [ngClass]="{isOwnerView,
+      isRenterView,
+      isRegisterPage,
+      isTos, scrolled}">
+    <div class="inner-header">
+      <div class="logo" [routerLink]="['']">
+        <img width="120px" [src]="_Images.logo_full" alt="Fumes Logo" />
+      </div>
+      <div class="links">
+        <ul>
+          <li class="desktop-only" *ngIf="isOwnerView">
+            <a [routerLink]="['/solutions']">Solutions</a>
+          </li>
+          <li class="desktop-only" *ngIf="isOwnerView">
+            <a href="#contact">Contact</a>
+          </li>
+          <li class="desktop-only">
+            <button class="start-today-button" (click)="switchApp('owner')">
+              <span>Login</span>
+              <mat-icon>login</mat-icon>
+            </button>
+          </li>
+          <li class="mobile-only">
+            <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="site menu">
+              <mat-icon>menu</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button [routerLink]="['/solutions']" mat-menu-item>
+                <mat-icon>lightbulb</mat-icon>
+                <span>Solutions</span>
+              </button>
+              <button mat-menu-item>
+                <mat-icon>mail</mat-icon>
+                <span><a href="#contact">Contact</a></span>
+              </button>
+              <button (click)="switchApp('owner')" mat-menu-item>
+                <mat-icon>login</mat-icon>
+                <span>Login Instead</span>
+              </button>
+            </mat-menu>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>

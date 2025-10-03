@@ -1,4 +1,511 @@
-html, body {
-  display: block;
+/* CSS Variables (converted from SCSS variables) */
+:root {
+  --app-bg: #fbfbfe;
+  --primary: #ff0266;
+  --secondary: #4ecdc4;
+  --tertiary: #d6dbd2;
+  --quadrary: #ffde03;
+  --white: #fff;
+  --black: #000;
+  --accent: #4ecdc4;
+  --warn: #ffc107;
+  --success: #5ccd56;
+  --danger: #d91930;
+  --info: #008dd3;
+  --tri-gradient: radial-gradient(circle at 11.97% 21%, var(--primary), transparent 59%),
+    radial-gradient(circle at 77.56% 18.89%, #ffc107, transparent 81%),
+    radial-gradient(circle at 50% 50%, var(--white), var(--white) 100%);
+  --app-gradient: linear-gradient(45deg, var(--primary), #d61f49);
+  --app-danger-gradient: linear-gradient(45deg, #eb3349, var(--primary));
+  --app-success-gradient: linear-gradient(45deg, var(--success), #a8e063);
+  --app-warn-gradient: linear-gradient(45deg, var(--warn), #edde5d);
+  --really-light-gray: #f5f5f4;
+  --light-gray: #e5e5e5;
+  --medium-gray: #adadad;
+  --dark-gray: #504f4f;
+  --really-dark-gray: #333;
+  --text-on-white: #32325d;
+  --primary-gradient-transparent: linear-gradient(
+    90deg,
+    rgba(0, 18, 176, 0.8),
+    rgba(255, 255, 255, 0)
+  );
+  --primary-font: "Noto Sans", sans-serif;
+  --base-font-color: #3e3e3e;
+  --body-background: #e0e3ee;
+  --sideNavWidth: 410px;
+  --coreNavWidth: 100px;
+  --default-box-padding: 12px;
+  --mobileWidth: 460px;
+  --phabletWidth: 600px;
+  --tabletWidth: 768px;
+  --desktopWidth: 960px;
+}
+
+/* Basic HTML styling */
+html {
+  color-scheme: light dark;
   height: 100%;
+  background: linear-gradient(45deg, #fafbfd, #ecf2fa, #ebf2f8, #fef3f4);
+  font-family: var(--primary-font);
+}
+
+body {
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+html,
+body {
+  height: auto;
+  background-size: cover;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: var(--primary-font);
+}
+
+body {
+  margin: 0;
+  font-family: var(--primary-font);
+}
+
+/* Keyframe animations */
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+@keyframes rotateX {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(1%);
+  }
+  100% {
+    transform: translateX(-200%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rotateOut {
+  from {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+
+  to {
+    opacity: 0;
+    transform: rotateY(-30deg);
+  }
+}
+
+/* Media queries (converted from SCSS mixins) */
+@media (max-width: 460px) {
+  /* phone-only styles would go here */
+}
+
+@media (max-width: 600px) {
+  /* phablet-down styles would go here */
+}
+
+@media (max-width: 768px) {
+  /* tablet-down styles would go here */
+}
+
+@media (max-width: 960px) {
+  /* desktop-down styles would go here */
+}
+
+@media (min-width: 769px) {
+  /* desktop styles would go here */
+}
+
+@media screen and (min-width: 1000px) {
+  html {
+    font-size: 22px;
+  }
+}
+
+@media print {
+  /* print styles would go here */
+}
+
+/* Global styles */
+button {
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+ul {
+  margin-block-start: 0;
+  margin-block-end: 0;
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+  padding-inline-start: 0;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: "Noto Sans", sans-serif;
+}
+
+p.error {
+  color: var(--danger);
+}
+
+/* Material icon styles (converted from nested SCSS) */
+mat-icon.icon-24 {
+  width: 50px;
+  font-size: 50px;
+}
+
+mat-icon.icon-50 {
+  width: 50px;
+  font-size: 50px;
+}
+
+mat-icon.icon-100 {
+  width: 100px;
+  font-size: 100px;
+}
+
+/* Link styles */
+a {
+  touch-action: manipulation;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+.page-container {
+  position: relative;
+  overflow-x: clip;
+  font-family: "Noto Sans", sans-serif;
+}
+
+a.internal-link {
+  text-decoration: underline;
+  color: var(--primary);
+}
+
+a:visited {
+  color: inherit;
+}
+
+a.link {
+  text-decoration: underline;
+  font-size: 0.65rem;
+  color: var(--primary);
+}
+
+/* HR styles */
+hr {
+  display: block;
+  width: 100%;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-color: var(--light-gray);
+}
+
+/* Container styles */
+.container {
+  max-width: 1140px;
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-fluid {
+  width: 100%;
+  padding: 15px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.center {
+  text-align: center;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+.center > * {
+  width: 100%;
+}
+
+/* Dialog styles (converted from nested SCSS) */
+dialog {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+}
+
+dialog[open] {
+  animation: fadeIn 0.3s ease-out;
+}
+
+dialog.closing {
+  transform: rotateY(-15deg) rotateX(-15deg);
+  transition: all ease 300ms;
+}
+
+dialog .inner-dialog {
+  transition: all 0.3s ease-in-out;
+  position: relative;
+  height: 600px;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 12px;
+}
+
+dialog .inner-dialog .text {
+  border-radius: 12px;
+  padding: 12px 24px;
+  width: 100%;
+  height: 50%;
+  background: #fff;
+  text-align: center;
+}
+
+dialog .inner-dialog .img-container {
+  border-radius: 12px 12px 0 0;
+  position: relative;
+  height: 50%;
+  width: 100%;
+  overflow: clip;
+  background: #00bac9;
+}
+
+dialog .inner-dialog .img-container img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 302px;
+  left: 50%;
+  margin-left: -151px;
+}
+
+dialog .inner-dialog .closeBtn {
+  z-index: 1;
+  position: absolute;
+  right: 12px;
+  top: 12px;
+}
+
+/* Utility classes for common transitions and transforms */
+.transition-all {
+  -webkit-transition: all ease 300ms;
+  -moz-transition: all ease 300ms;
+  -ms-transition: all ease 300ms;
+  -o-transition: all ease 300ms;
+  transition: all ease 300ms;
+}
+
+.border-radius-12 {
+  -webkit-border-radius: 12px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.crisp-image {
+  image-rendering: -moz-crisp-edges; /* Firefox */
+  image-rendering: -o-crisp-edges; /* Opera */
+  image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
+  image-rendering: crisp-edges;
+}
+
+/* Basic Material Design-like color scheme */
+.mat-primary {
+  background-color: var(--primary);
+  color: white;
+}
+
+.mat-accent {
+  background-color: var(--accent);
+  color: white;
+}
+
+.mat-warn {
+  background-color: var(--warn);
+  color: black;
+}
+
+/* Basic button styles to replace Angular Material buttons */
+.mat-button,
+.mat-raised-button,
+.mat-fab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--primary-font);
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.mat-raised-button {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mat-raised-button:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.mat-fab {
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+}
+
+.mat-fab.mat-fab-extended {
+  border-radius: 28px;
+  width: auto;
+  padding: 0 20px;
+  min-width: 48px;
+}
+
+/* Basic form field styles to replace Angular Material form fields */
+.mat-form-field {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.mat-form-field input,
+.mat-form-field textarea,
+.mat-form-field select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--light-gray);
+  border-radius: 4px;
+  font-family: var(--primary-font);
+  font-size: 16px;
+}
+
+.mat-form-field input:focus,
+.mat-form-field textarea:focus,
+.mat-form-field select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(255, 2, 102, 0.2);
+}
+
+.mat-form-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  color: var(--base-font-color);
+}
+
+/* Basic spinner styles */
+.mat-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--light-gray);
+  border-top: 4px solid var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Basic slider styles */
+.mat-slider {
+  width: 100%;
+  height: 20px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--light-gray);
+  border-radius: 10px;
+  outline: none;
+}
+
+.mat-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+}
+
+.mat-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  cursor: pointer;
+  border: none;
 }

@@ -1,0 +1,91 @@
+header {
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 3;
+  transition: background 250ms ease-in;
+}
+
+header.scrolled {
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+header.isOwnerView {}
+
+header.isRenterView {
+  background: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+header.isRegisterPage {
+  display: none;
+}
+
+header.isVanityPage {
+  display: none;
+}
+
+header.isTos {}
+
+header .inner-header {
+  position: relative;
+  width: 100%;
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+}
+
+header .inner-header .logo {
+  padding-left: 15px;
+  text-align: left;
+  width: 150px;
+  position: relative;
+}
+
+header .inner-header .links {
+  padding-right: 15px;
+  margin-left: auto;
+}
+
+header .inner-header .links ul {
+  display: flex;
+  gap: 25px;
+  list-style: none;
+  flex-direction: row;
+  align-items: center;
+}
+
+header .inner-header .links ul li.desktop-only {
+  display: block;
+}
+
+header .inner-header .links ul li.desktop-only a {
+  text-rendering: optimizeLegibility;
+}
+
+header .inner-header .links ul li.desktop-only a:hover {
+  text-decoration: underline;
+}
+
+header .inner-header .links ul li.mobile-only {
+  display: none;
+}
+
+header .inner-header .links ul li:first-of-type {
+  margin-right: 18px;
+}
+
+@media screen and (max-width: 767px) {
+  header .inner-header .links ul li.desktop-only {
+    display: none;
+  }
+
+  header .inner-header .links ul li.mobile-only {
+    display: block;
+  }
+}

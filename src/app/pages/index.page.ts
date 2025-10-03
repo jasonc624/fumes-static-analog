@@ -1,13 +1,15 @@
 import { Component } from '@angular/core';
-
-import { AnalogWelcome } from './analog-welcome';
+import { OwnersComponent } from '../components/owners/owners';
+import { HeaderComponent } from '../components/header/header.component';
 
 @Component({
   selector: 'app-home',
-  imports: [AnalogWelcome],
+  imports: [HeaderComponent, OwnersComponent],
   template: `
-     <app-analog-welcome/>
+    <div class="page-container">
+      <app-header />
+      <landing-owners />
+    </div>
   `,
 })
-export default class HomeComponent {
-}
+export default class HomeComponent {}
