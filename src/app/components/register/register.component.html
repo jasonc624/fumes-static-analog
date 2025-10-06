@@ -1,0 +1,146 @@
+@if(_isBrowser){
+<form style="height: 100dvh; overflow-y: scroll;" class="styled-form"
+  [ngClass]="{ submitting: isSubmitting, 'touched-form': touchedForm }">
+  <div class="form-hero" [ngStyle]="backgroundStyle">
+    @if (registrationType === 'owner') {
+      <ng-container *ngTemplateOutlet="ownerWelcome"></ng-container>
+    } @else {
+      <ng-container *ngTemplateOutlet="renterWelcome"></ng-container>
+    }
+
+    <div class="overlay"></div>
+  </div>
+  <div class="form-controls" (mouseenter)="touchedForm = true" (mouseleave)="touchedForm = false">
+    @if(!successfullyRegistered){
+    <mat-icon class="touch-animation" *ngIf="!touchedForm">touch_app</mat-icon>
+    <mat-stepper #stepper [orientation]="(stepperOrientation | async)!">
+      <mat-step [completed]="basics.valid" [stepControl]="basics">
+        <ng-template matStepLabel>Basics</ng-template>
+        <h3>The Basics</h3>
+        <p>We need to collect some basic info about you and your company.</p>
+        <form [formGroup]="basics">
+          <div class="col-form">
+            <!-- firstname -->
+            <input data-label="First Name" class="full" fumesInput id="firstName" formControlName="firstName"
+              type="text" placeholder="Name" />
+            <!-- last name -->
+            <input data-label="Last Name" class="full" fumesInput id="lastName" formControlName="lastName" type="text"
+              placeholder="Surname" />
+            <!-- Phone -->
+            <input data-label="Phone" class="full" fumesInput id="phone" formControlName="phone" type="phone"
+              placeholder="1234567890" />
+          </div>
+          <!-- Next -->
+          <button mat-raised-button [disabled]="basics.invalid" color="accent" matStepperNext>
+            Next
+          </button>
+        </form>
+      </mat-step>
+      <mat-step [completed]="location.valid" [stepControl]="location">
+        <ng-template matStepLabel>Location</ng-template>
+        <h3>Where are you located?</h3>
+        <p *ngIf="registrationType === 'owner'">
+          We will generate an initial location for your business. You can add
+          more later.
+        </p>
+        <p *ngIf="registrationType === 'renter'">
+          What area are you looking in?
+        </p>
+        <form [formGroup]="location">
+          <div class="col-form">
+            <lib-country-state-tz formControlName="country_state_timezone"></lib-country-state-tz>
+          </div>
+          <button mat-raised-button matStepperPrevious>
+            Back
+          </button>
+          <button mat-raised-button [disabled]="location.invalid" matStepperNext color="accent">
+            Next
+          </button>
+        </form>
+      </mat-step>
+      <mat-step [completed]="finish.valid" [stepControl]="finish">
+        <h3>Almost there.</h3>
+        <p>Setup your credentials and final details.</p>
+        <form [formGroup]="finish">
+          <ng-template matStepLabel>Finish</ng-template>
+          <div class="col-form">
+            <lib-email-password formControlName="email_password"></lib-email-password>
+            <!-- fleet name -->
+            <input data-label="Fleet or Business Name" class="full" fumesInput formControlName="fleetName" type="text"
+              placeholder="e.g. Bob's Rentals LLC." />
+            <input data-label="Fleet Insurer" class="full" fumesInput id="insurerName" formControlName="insurerName"
+              type="text" placeholder="What insurance provider do your cars have?" />
+          </div>
+          <!-- TOS agree -->
+          <!-- <fumes-checkbox formControlName="tos">
+            <label style="margin-bottom: 0">I have read and agree to Fumes'
+              <a class="link" target="_blank" [routerLink]="['/', 'terms-of-service']">Terms of Service</a>
+            </label>
+          </fumes-checkbox> -->
+          <div class="flex-checkbox-group" style="margin-top: 15px;">
+            <input type="checkbox" formControlName="tos" fumesCheckbox />
+            <label style="margin-bottom: 0">I have read and agree to Fumes
+              <a class="link" target="_blank" [routerLink]="['/', 'terms-of-service']">Terms of Service</a>
+            </label>
+          </div>
+          <br />
+          <button aria-label="Submit Registration Form" mat-raised-button type="submit"
+            [disabled]="finish.invalid || basics.invalid || location.invalid" (click)="submitRegister()" color="accent">
+            Register as {{ registrationType === "owner" ? "Owner" : "Renter" }}
+          </button>
+          <div *ngIf="errMsg" style="color: red">{{ errMsg }}</div>
+        </form>
+      </mat-step>
+    </mat-stepper>
+    <!-- Show erro -->
+    @if(errorMessage|async) {
+    {{ errorMessage | async }}
+    }
+    <!-- End if not success yet -->
+    } @else{
+    <div class="empty-collection">
+      <h1>Success!</h1>
+      <p>You can now login.</p>
+    </div>
+    }
+  </div>
+</form>
+}
+
+<ng-template #ownerWelcome>
+  <div class="welcome-message">
+    <h1>Welcome to the Rental Owner Registration!</h1>
+    <p>
+      We can't wait to officially welcome you into our community of car rental
+      industry experts. This registration process is specifically designed for
+      owners of car rental companies who have their business filing in their
+      respective state.
+    </p>
+    <div class="two-options">
+      <a [href]="goToLogin()">
+        <span>Already have an account?</span>
+        <span>Login</span></a>
+      <a class="disabled" (click)="switchRegisterType('renter')">
+        <span>Looking to rent?</span><span>Rent instead</span>
+      </a>
+    </div>
+  </div>
+</ng-template>
+<ng-template #renterWelcome>
+  <div class="welcome-message">
+    <h1>Start Your Adventure Now! Your Dream Car Awaits!</h1>
+    <p>
+      Strap in and get ready for a journey filled with convenience, choices, and
+      unforgettable road trips!
+    </p>
+    <div class="two-options">
+      <a [href]="goToLogin()">
+        <span>Already have an account?</span>
+        <span>Login</span></a>
+      <a (click)="switchRegisterType('owner')">
+        <span>Have a rental business?</span>
+        <span>Start here</span>
+      </a>
+    </div>
+  </div>
+</ng-template>

@@ -402,66 +402,95 @@
           <p>We will get back to you shortly.</p>
         </div>
         } @else {
-        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
-          <mat-form-field appearance="outline">
-            <mat-label>Name</mat-label>
-            <input
-              matInput
-              type="text"
-              formControlName="name"
-              placeholder="Enter your name"
-              required
-            />
-          </mat-form-field>
-          <br />
-          <br />
-          <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
-            <input
-              matInput
-              type="email"
-              formControlName="email"
-              placeholder="hello@email.com"
-              required
-            />
-          </mat-form-field>
-          <br />
-          <br />
-          <mat-form-field appearance="outline">
-            <mat-label>Fleet Size</mat-label>
-            <mat-select formControlName="fleetSize">
-              <mat-option value="lt5">5 cars or under</mat-option>
-              <mat-option value="gt5lt25">5-25 cars</mat-option>
-              <mat-option value="gt25lt50">25-50 cars</mat-option>
-              <mat-option value="gt50lt100">50-100 cars</mat-option>
-              <mat-option value="gt100">100+ cars</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <br />
-          <br />
-          <mat-form-field appearance="outline">
-            <mat-label>Message</mat-label>
-            <textarea
-              matInput
-              formControlName="message"
-              rows="4"
-              placeholder="Hi, I'm interested in your product, please call me at..."
-              required
-            ></textarea>
-          </mat-form-field>
-          <br />
-          <br />
-          <div class="center">
-            <button
-              mat-raised-button
-              color="primary"
-              type="submit"
-              [disabled]="contactForm.invalid"
-            >
-              Send Message
-            </button>
-          </div>
-        </form>
+        <div class="contact-form-container">
+          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="enhanced-form">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Full Name</mat-label>
+                <input
+                  matInput
+                  type="text"
+                  formControlName="name"
+                  placeholder="Enter your full name"
+                  required
+                />
+                <mat-icon matPrefix>person</mat-icon>
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Email Address</mat-label>
+                <input
+                  matInput
+                  type="email"
+                  formControlName="email"
+                  placeholder="your.email@company.com"
+                  required
+                />
+                <mat-icon matPrefix>email</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field fleet-select">
+                <mat-label>Fleet Size</mat-label>
+                <mat-select formControlName="fleetSize">
+                  <mat-option value="lt5">
+                    <mat-icon>directions_car</mat-icon>
+                    5 cars or under
+                  </mat-option>
+                  <mat-option value="gt5lt25">
+                    <mat-icon>local_shipping</mat-icon>
+                    5-25 cars
+                  </mat-option>
+                  <mat-option value="gt25lt50">
+                    <mat-icon>airport_shuttle</mat-icon>
+                    25-50 cars
+                  </mat-option>
+                  <mat-option value="gt50lt100">
+                    <mat-icon>commute</mat-icon>
+                    50-100 cars
+                  </mat-option>
+                  <mat-option value="gt100">
+                    <mat-icon>business</mat-icon>
+                    100+ cars
+                  </mat-option>
+                </mat-select>
+                <mat-icon matPrefix>fleet</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row full-width">
+              <mat-form-field appearance="outline" class="form-field message-field">
+                <mat-label>Tell us about your needs</mat-label>
+                <textarea
+                  matInput
+                  formControlName="message"
+                  rows="5"
+                  placeholder="Hi, I'm interested in your product. Please tell me more about pricing and implementation for my fleet..."
+                  required
+                ></textarea>
+                <mat-icon matPrefix>message</mat-icon>
+              </mat-form-field>
+            </div>
+
+            <div class="form-actions">
+              <button
+                mat-raised-button
+                color="primary"
+                type="submit"
+                [disabled]="contactForm.invalid"
+                class="submit-button"
+              >
+                <mat-icon>send</mat-icon>
+                Send Message
+              </button>
+              <p class="form-note">
+                <mat-icon>security</mat-icon>
+                Your information is secure and will never be shared
+              </p>
+            </div>
+          </form>
+        </div>
         } } @else {
         <div class="center loading">
           <mat-spinner></mat-spinner>
@@ -483,39 +512,6 @@
     <li></li>
     <li></li>
   </ul>
-  <footer class="footer">
-    <footer class="footer">
-      <div class="container">
-        <div class="row">
-          <div class="col-md-4">
-            <a
-              target="_blank"
-              appTrackClick="facebook_group_click"
-              href="https://www.facebook.com/groups/369733679395081"
-              >Join Our Facebook Group</a
-            >
-            <br />
-          </div>
-          <div style="margin-top: 12px" class="col-md-4">
-            <span
-              >Fumes Fleet Utility Management Enhancing System LLC 2023</span
-            >
-          </div>
-          <p>
-            Disclosure: Our software is free to access, which means you can
-            register and login without needing a credit card. All features are
-            readily available for your use. However, please note that we charge
-            a fee for each transaction processed. This fee applies only when you
-            initiate a transaction within the software. We strive to maintain
-            transparency in our pricing, and we will clearly communicate the
-            applicable charges before any transaction takes place. If you have
-            any questions regarding our pricing or billing, please feel free to
-            reach out to our support team for assistance.
-          </p>
-        </div>
-      </div>
-    </footer>
-  </footer>
 </div>
 
 <dialog class="{{ closing ? 'closing' : '' }}" #promo>

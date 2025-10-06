@@ -1,0 +1,160 @@
+@use '../../../variables.scss' as *;
+h4 {
+  font-style: oblique;
+  font-weight: bolder;
+}
+.booking-component {
+  position: relative;
+  container-type: inline-size;
+  container-name: booking_component;
+  overflow-y: scroll;
+  height: 100vh;
+  width: 100vw;
+  background-image: radial-gradient(#fafbfd, #ecf2fa, #ebf2f8, #fef3f4);
+  background-size: 100%;
+  .inner-booking {
+    background: $white;
+    max-width: 900px;
+    margin: 125px auto 75px auto;
+    width: 100%;
+    border: 1px solid black;
+    @include border-radius(12px);
+    padding: 24px;
+  }
+}
+.vehicle-status {
+  display: flex;
+  gap: 15px;
+  .image {
+    @include border-radius(12px);
+    background-color: $really-light-gray;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    position: relative;
+    overflow: hidden;
+    width: 160px;
+    height: 160px;
+  }
+  .info {
+
+    font-weight: 800;
+    .stats {
+      margin: 12px 0;
+    }
+  }
+  .booking-checkinout {
+    width: 100%;
+    max-width: 380px;
+  }
+}
+.messages-container {
+  height: 575px;
+  position: relative;
+}
+.owner-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid $really-light-gray;
+  .owner-contacts {
+    display: flex;
+    gap: 24px;
+  }
+}
+/*Reservation*/
+.reservation.full {
+  margin: 24px auto;
+  mat-icon {
+    margin: auto 15px;
+  }
+  .original {
+    display: flex;
+    justify-content: center;
+    .location {
+      a {
+        color: $primary;
+        text-decoration: underline;
+      }
+    }
+  }
+  &.has-proposal {
+    .reservation-details .original {
+      opacity: 0.5;
+      .date,
+      .location {
+        > * {
+          text-decoration: line-through;
+        }
+      }
+    }
+  }
+  .location-date {
+    display: inline-flex;
+    justify-content: space-between;
+    vertical-align: middle;
+    border: 1px solid $light-gray;
+    padding: 10px;
+    max-width: 400px;
+    width: calc(50% - 30px);
+    margin-bottom: 12px;
+    @include border-radius(12px);
+    .location,
+    .date {
+      display: inline-block;
+    }
+    .location {
+      p {
+        width: 100%;
+        max-width: 300px;
+        padding-right: 12px;
+        a {
+          white-space: pre-wrap;
+        }
+      }
+    }
+    @include for-size(tablet-down) {
+      justify-content: space-around !important;
+      flex-wrap: wrap !important;
+    }
+  }
+  .date {
+    text-align: center;
+    width: 75px;
+    vertical-align: top;
+    .month {
+      color: $dark-gray;
+      font-size: 14px;
+    }
+    .day {
+      color: $medium-gray;
+      font-size: 12px;
+    }
+    .day-number {
+      color: $text-on-white;
+      font-size: 24px;
+    }
+    .time {
+      color: $really-dark-gray;
+      font-size: 12px;
+    }
+  }
+}
+
+.location-map {
+  display: block;
+  overflow: hidden;
+  height: 250px;
+  border-radius: 12px;
+  position: relative;
+  #pickupLocation {
+    height: 100%;
+  }
+}
+
+@container booking_component (max-width: 800px) {
+  .vehicle-status {
+    flex-wrap: wrap-reverse;
+  }
+}

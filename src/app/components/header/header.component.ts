@@ -22,7 +22,7 @@ import { WINDOW } from '../../tokens/window.token';
   ],
   selector: 'app-header',
   templateUrl: './header.html',
-  styleUrls: ['./header.css'],
+  styleUrls: ['./header.scss'],
 })
 export class HeaderComponent extends BaseComponent implements OnInit {
   private readonly router = inject(Router);

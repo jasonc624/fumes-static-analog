@@ -45,6 +45,7 @@ import { NgxTypewriterComponent } from '@omnedia/ngx-typewriter';
 import { NgxGradientTextComponent } from '@omnedia/ngx-gradient-text';
 import { NgxNeonUnderlineComponent } from '@omnedia/ngx-neon-underline';
 import { NgxConnectionBeamComponent } from '@omnedia/ngx-connection-beam';
+import { BaseComponent } from '../base/base.component';
 
 @Component({
   standalone: true,
@@ -71,12 +72,12 @@ import { NgxConnectionBeamComponent } from '@omnedia/ngx-connection-beam';
   ],
   selector: 'landing-owners',
   templateUrl: './owners.component.html',
-  styleUrls: ['./owners.component.css'],
+  styleUrls: ['./owners.component.scss'],
   providers: [
     // { provide: LIB_ENV, useValue: environment }
   ],
 })
-export class OwnersComponent {
+export class OwnersComponent extends BaseComponent {
   private title = inject(Title);
   private http = inject(HttpClient);
   private elementRef = inject(ElementRef);
@@ -109,9 +110,33 @@ export class OwnersComponent {
   dialogDismissedAlready = false;
   promoElem!: HTMLDialogElement;
   @ViewChild('promo', { read: ElementRef }) promoRef!: ElementRef;
-
-  ngOnInit(): void {
-    // Implementation for OnInit interface
+  
+  @HostListener('window:scroll', ['$event'])
+  onScroll(event: any) {
+    if (this.isBrowser) {
+      if (window) {
+        const top = window?.pageYOffset;
+        if (top > 3300 && !this.dialogDismissedAlready) {
+          this.openPromo();
+        }
+      }
+    }
+  }
+  
+  constructor() {
+    super();
+    afterNextRender(() => {
+      if (this.isBrowser) {
+        this.observeHiddenElements();
+        if (this.promoRef && this.promoRef.nativeElement) {
+          this.promoElem = this.promoRef.nativeElement;
+          // Dynamically import dialog-polyfill to avoid SSR issues
+          import('dialog-polyfill').then((dialogPolyfill) => {
+            dialogPolyfill.default.registerDialog(this.promoElem);
+          });
+        }
+      }
+    });
   }
 
   // @HostListener('window:scroll', ['$event'])
@@ -263,7 +288,7 @@ export class OwnersComponent {
       const inquiryData = { name, email, fleetSize, message };
 
       this.http
-        .post(`${import.meta.env['VITE_LANDING']}/api/inquire`, inquiryData)
+        .post(`${window.location.origin}/api/v1/inquire`, inquiryData)
         .pipe(finalize(() => (this.inquirySending = false)))
         .subscribe({
           next: (res: any) => {
@@ -297,7 +322,7 @@ export class OwnersComponent {
     // Replace Firebase function with HTTP call
     this.http
       .post(
-        `${import.meta.env['VITE_LANDING']}/api/inquire`,
+        `${window.location.origin}/api/v1/inquire`,
         this.contactForm.value
       )
       .pipe(finalize(() => (this.inquirySending = false)))

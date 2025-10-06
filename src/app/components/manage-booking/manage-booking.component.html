@@ -1,0 +1,196 @@
+@if(booking$|async;as booking) {
+
+<div class="booking-component">
+  <div class="inner-booking">
+    <h3>Welcome {{ booking.customer.firstName }}</h3>
+    <div class="vehicle-status">
+      <div class="image" [ngStyle]="{
+          'background-image': 'url(' + booking.vehicle.photos[0].url + ')'
+        }"></div>
+      <div class="info">
+        <div class="vehicle-detail">
+          {{ booking.vehicle.details?.year }}
+          {{ booking.vehicle.details?.make }}
+          {{ booking.vehicle.details?.model }}
+          {{ booking.vehicle.details?.trim }}
+        </div>
+        <div class="stats">
+          <fumes-vehicle-stats [vehicle]="booking.vehicle"></fumes-vehicle-stats>
+          <button [disabled]="isLoadingVerification" mat-button color="accent"
+            (click)="createVerificationSession(booking)">
+            Verify Driver's License
+          </button>
+        </div>
+      </div>
+    </div>
+    <mat-tab-group (selectedTabChange)="onTabChange()" [(selectedIndex)]="selectedTabIndex">
+      <mat-tab label="Details">
+        <h3>Your Reservation</h3>
+        <div class="reservation full {{
+            booking?.proposed_change?.reservation ? 'has-proposal' : ''
+          }}">
+          <div class="reservation-details {{
+              booking?.proposed_change?.reservation ? 'has-proposal' : ''
+            }}">
+            <div class="original">
+              <div class="location-date">
+                <div class="location">
+                  <strong class="location-action">Starts</strong>
+                  <p>
+                    <a target="_blank" href="http://maps.google.com/?q={{
+                        booking.reservation.pickupLocation.location.place
+                          .description
+                      }}">{{
+                      booking.reservation.pickupLocation.location.place
+                      .description
+                      }}</a>
+                  </p>
+                </div>
+                <div class="date">
+                  <div class="day">
+                    {{
+                    formatDate(booking.reservation?.startDate) | date : "EE"
+                    }}
+                  </div>
+                  <div class="month">
+                    {{
+                    formatDate(booking.reservation?.startDate) | date : "LLLL"
+                    }}
+                  </div>
+                  <div class="day-number">
+                    {{
+                    formatDate(booking.reservation?.startDate) | date : "d"
+                    }}
+                  </div>
+                  <div class="time">
+                    {{
+                    formatDate(booking.reservation?.startDate)
+                    | date : "hh:mm a"
+                    }}
+                  </div>
+                </div>
+              </div>
+              <mat-icon>east</mat-icon>
+              <div class="location-date">
+                <div class="location">
+                  <strong class="location-action"> Ends</strong>
+                  <p>
+                    <a target="_blank" href="http://maps.google.com/?q={{
+                        booking.reservation.dropoffLocation.location.place
+                          .description
+                      }}">{{
+                      booking.reservation.dropoffLocation.location.place
+                      .description
+                      }}</a>
+                  </p>
+                </div>
+                <div class="date">
+                  <div class="day">
+                    {{ formatDate(booking.reservation?.endDate) | date : "EE" }}
+                  </div>
+                  <div class="month">
+                    {{
+                    formatDate(booking.reservation?.endDate) | date : "LLLL"
+                    }}
+                  </div>
+                  <div class="day-number">
+                    {{ formatDate(booking.reservation?.endDate) | date : "d" }}
+                  </div>
+                  <div class="time">
+                    {{
+                    formatDate(booking.reservation?.endDate)
+                    | date : "hh:mm a"
+                    }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Map -->
+        <div class="location-map">
+          <lib-fumes-map id="pickupLocation" [zoom]="18" [environment]="env" [startingGeoPoint]="{
+              lat: booking.reservation.pickupLocation.location.geopoint
+                .latitude,
+              lon: booking.reservation.pickupLocation.location.geopoint
+                .longitude
+            }" [mapType]="'point'" [disableZoom]="false" [disablePan]="false"></lib-fumes-map>
+        </div>
+        <!-- Owner -->
+        <h3>Contact</h3>
+        <div class="owner-container">
+          <div class="owner-details">
+            <strong>{{ booking?.fleet?.name }}</strong>
+          </div>
+          <div class="owner-contacts">
+            <a href="tel:+1{{ booking?.fleet?.owner?.phone }}" mat-mini-fab>
+              <mat-icon>phone</mat-icon>
+            </a>
+            <a href="mailto:{{ booking?.fleet?.owner?.email }}" mat-mini-fab>
+              <mat-icon>alternate_email</mat-icon>
+            </a>
+            <button mat-mini-fab (click)="goToTab(1)">
+              <mat-icon>messages</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-tab>
+      <!-- Messages -->
+      <mat-tab label="Messages">
+        <div class="messages-container">
+          <lib-conversation #conversationCmp [thread]="booking.bookingId" [booking]="booking" [fleet]="fleet"
+            [guest]="booking.customer" [account]="booking.customer" [styles]="'height:100%'">
+            <div class="owner-container">
+              <div class="owner-details">
+                <strong>{{ booking?.fleet?.name }}</strong>
+              </div>
+              <div class="owner-contacts">
+                <a href="tel:+1{{ booking?.fleet?.owner?.phone }}" mat-mini-fab>
+                  <mat-icon>phone</mat-icon>
+                </a>
+                <a href="mailto:{{ booking?.fleet?.owner?.email }}" mat-mini-fab>
+                  <mat-icon>alternate_email</mat-icon>
+                </a>
+              </div>
+            </div>
+          </lib-conversation>
+        </div>
+      </mat-tab>
+      <!-- Reciept -->
+      <mat-tab label="Reciept">
+        <h4>Pricing Breakdown</h4>
+        <hr />
+        <p style="padding: 24px">
+          Charges are subject to change pending tolls, parking tickets or any
+          subsequent expenses incurred during your reservation.
+        </p>
+        <lib-pricing-breakdown [hideFees]="true" [booking]="booking">
+        </lib-pricing-breakdown>
+        <h4>Payment</h4>
+        <hr />
+        <p style="padding: 24px">
+          If privacy is a concern you may enter payment details securely here.
+          The payment method will be usable for charges in this reservation by
+          the owner but sensitive information will be obscured.
+        </p>
+        <div class="modal-action-btns">
+          <button mat-raised-button (click)="openDateChangeDialog()">
+            Add Payment Method
+          </button>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>
+} @else {
+<mat-spinner></mat-spinner>
+}
+<dialog style="position: fixed; top: 25%; left: 0" #paymentDialog>
+  <div id="payment-element"></div>
+  <div class="modal-action-btns">
+    <button mat-button (click)="closeDialog()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="submitHandler()">
+      Submit
+    </button>
+  </div>
+</dialog>

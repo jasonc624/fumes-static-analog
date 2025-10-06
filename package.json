@@ -41,11 +41,13 @@
     "@omnedia/ngx-typewriter": "^3.1.1",
     "@omnedia/rxjs-typewriter": "^1.1.0",
     "dialog-polyfill": "^0.5.6",
+    "firebase": "^12.3.0",
+    "firebase-admin": "^13.5.0",
+    "firebase-functions": "^6.4.0",
     "rxjs": "~7.8.0",
     "sass": "^1.93.2",
     "sass-embedded": "^1.93.2",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
+    "tslib": "^2.3.0"
   },
   "devDependencies": {
     "@analogjs/platform": "^1.21.1",

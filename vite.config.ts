@@ -8,6 +8,9 @@ import type { Importer } from 'sass-embedded';
 export default defineConfig(({ mode }) => ({
   build: {
     target: ['es2020'],
+    rollupOptions: {
+      input: 'index.html'
+    }
   },
   resolve: {
     mainFields: ['module'],
