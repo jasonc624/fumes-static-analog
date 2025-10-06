@@ -6,24 +6,24 @@
         <h1>
           Car Rental Software | Easy Fleet Management for...&nbsp;
           @if(isBrowser) {
-            <om-typewriter
-              [words]="[
-                'Any Business',
-                'Someone Just Starting Out',
-                'Large Scale Operations',
-                'Prudent Entrepreneurs'
-              ]"
-            ></om-typewriter>
+          <om-typewriter
+            [words]="[
+              'Any Business',
+              'Someone Just Starting Out',
+              'Large Scale Operations',
+              'Prudent Entrepreneurs'
+            ]"
+          ></om-typewriter>
           }
         </h1>
 
         <strong>
           @if(isBrowser) {
-            <om-gradient-text
-              gradientStart="#ff0266"
-              gradientEnd="#4ecdc4"
-              [text]="'Cloud Based Fleet Management'"
-            ></om-gradient-text>
+          <om-gradient-text
+            gradientStart="#ff0266"
+            gradientEnd="#4ecdc4"
+            [text]="'Cloud Based Fleet Management'"
+          ></om-gradient-text>
           }
         </strong>
         <p style="margin-top: 8px !important">
@@ -85,11 +85,11 @@
               <mat-icon>all_inclusive</mat-icon>
             </div>
             @if(isBrowser) {
-              <om-gradient-text
-                gradientStart="#ff0266"
-                gradientEnd="#4ecdc4"
-                [text]="'Cars'"
-              ></om-gradient-text>
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'Cars'"
+            ></om-gradient-text>
             }
             <mat-icon>directions_car</mat-icon>
           </div>
@@ -100,11 +100,11 @@
               <mat-icon>all_inclusive</mat-icon>
             </div>
             @if(isBrowser) {
-              <om-gradient-text
-                gradientStart="#ff0266"
-                gradientEnd="#4ecdc4"
-                [text]="'Users'"
-              ></om-gradient-text>
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'Users'"
+            ></om-gradient-text>
             }
             <mat-icon>groups</mat-icon>
           </div>
@@ -115,11 +115,11 @@
               <mat-icon>all_inclusive</mat-icon>
             </div>
             @if(isBrowser) {
-              <om-gradient-text
-                gradientStart="#ff0266"
-                gradientEnd="#4ecdc4"
-                [text]="'Integrations'"
-              ></om-gradient-text>
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'Integrations'"
+            ></om-gradient-text>
             }
             <mat-icon>account_tree</mat-icon>
           </div>
@@ -141,11 +141,11 @@
               <mat-icon>all_inclusive</mat-icon>
             </div>
             @if(isBrowser) {
-              <om-gradient-text
-                gradientStart="#ff0266"
-                gradientEnd="#4ecdc4"
-                [text]="'Locations'"
-              ></om-gradient-text>
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'Locations'"
+            ></om-gradient-text>
             }
             <mat-icon>maps_home_work</mat-icon>
           </div>
@@ -156,11 +156,11 @@
               <mat-icon>all_inclusive</mat-icon>
             </div>
             @if(isBrowser) {
-              <om-gradient-text
-                gradientStart="#ff0266"
-                gradientEnd="#4ecdc4"
-                [text]="'E-Signs'"
-              ></om-gradient-text>
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'E-Signs'"
+            ></om-gradient-text>
             }
             <mat-icon>brush</mat-icon>
           </div>
@@ -171,65 +171,59 @@
               <mat-icon>all_inclusive</mat-icon>
             </div>
             @if(isBrowser) {
-              <om-gradient-text
-                gradientStart="#ff0266"
-                gradientEnd="#4ecdc4"
-                [text]="'Tasks'"
-              ></om-gradient-text>
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'Tasks'"
+            ></om-gradient-text>
             }
             <mat-icon>task</mat-icon>
           </div>
         </div>
         @if(isBrowser) {
-          <om-connection-beam
-            [fromRef]="RefItem1"
-            [toRef]="RefCenter"
-            [curvature]="-20"
-            [pathWidth]="4"
-          ></om-connection-beam>
+        <om-connection-beam
+          [fromRef]="RefItem1"
+          [toRef]="RefCenter"
+          [curvature]="-20"
+          [pathWidth]="4"
+        ></om-connection-beam>
+        } @if(isBrowser) {
+        <om-connection-beam
+          [fromRef]="RefItem2"
+          [toRef]="RefCenter"
+          [pathWidth]="4"
+        ></om-connection-beam>
+        } @if(isBrowser) {
+        <om-connection-beam
+          [fromRef]="RefItem3"
+          [toRef]="RefCenter"
+          [curvature]="20"
+          [pathWidth]="4"
+        ></om-connection-beam>
+        } @if(isBrowser) {
+        <om-connection-beam
+          [fromRef]="RefItem4"
+          [toRef]="RefCenter"
+          [reverse]="true"
+          [curvature]="-20"
+          [pathWidth]="4"
+        ></om-connection-beam>
+        } @if(isBrowser) {
+        <om-connection-beam
+          [fromRef]="RefItem5"
+          [toRef]="RefCenter"
+          [reverse]="true"
+          [pathWidth]="4"
+        ></om-connection-beam>
+        } @if(isBrowser) {
+        <om-connection-beam
+          [fromRef]="RefItem6"
+          [toRef]="RefCenter"
+          [reverse]="true"
+          [curvature]="20"
+          [pathWidth]="4"
+        ></om-connection-beam>
         }
-        @if(isBrowser) {
-          <om-connection-beam
-            [fromRef]="RefItem2"
-            [toRef]="RefCenter"
-            [pathWidth]="4"
-          ></om-connection-beam>
-        }
-        @if(isBrowser) {
-          <om-connection-beam
-            [fromRef]="RefItem3"
-            [toRef]="RefCenter"
-            [curvature]="20"
-            [pathWidth]="4"
-          ></om-connection-beam>
-        }
-        @if(isBrowser) {
-          <om-connection-beam
-            [fromRef]="RefItem4"
-            [toRef]="RefCenter"
-            [reverse]="true"
-            [curvature]="-20"
-            [pathWidth]="4"
-          ></om-connection-beam>
-        }
-        @if(isBrowser) {
-          <om-connection-beam
-            [fromRef]="RefItem5"
-            [toRef]="RefCenter"
-            [reverse]="true"
-            [pathWidth]="4"
-          ></om-connection-beam>
-        }
-        @if(isBrowser) {
-          <om-connection-beam
-            [fromRef]="RefItem6"
-            [toRef]="RefCenter"
-            [reverse]="true"
-            [curvature]="20"
-            [pathWidth]="4"
-          ></om-connection-beam>
-        }
-      
       </div>
     </div>
   </section>
@@ -262,15 +256,13 @@
   <section class="sponsor-banner">
     <div class="marquee-wrapper">
       @if(isBrowser) {
-        <om-marquee>
-          <div
-            #OmMarqueeContent
-            class="sponsor-logo"
-            *ngFor="let image of _Images?.integrations | keyvalue"
-          >
-            <img width="120" [src]="image?.value" [alt]="image?.key" />
-          </div>
-        </om-marquee>
+      <om-marquee>
+        @for (image of _Images?.integrations | keyvalue; track image.key) {
+        <div #OmMarqueeContent class="sponsor-logo">
+          <img width="120" [src]="image?.value" [alt]="image?.key" />
+        </div>
+        }
+      </om-marquee>
       }
       <div class="marquee-gradient left"></div>
       <div class="marquee-gradient right"></div>
@@ -312,26 +304,24 @@
       <h2>Pricing</h2>
       <p>Built to grow around your business</p>
       <div class="tier-list">
-        @for (tier of tierList; track $index) {
-        @if(isBrowser) {
-          <om-border-beam
-            gradientColorStart="#ff0266"
-            gradientColorEnd="#fff"
-            gradientDirection="to right"
-            borderWidth="2px"
-            borderColor="#fff"
-            class="tier-box hidden left"
-          >
-            <div class="inner-box" (click)="setSlider(tier.value)">
-              <h4>Tier {{ tier.tier }}</h4>
-              <div class="requirements">
-                {{ tier.requirements }}
-              </div>
-              <div class="fee">{{ tier.fee }}%*</div>
+        @for (tier of tierList; track $index) { @if(isBrowser) {
+        <om-border-beam
+          gradientColorStart="#ff0266"
+          gradientColorEnd="#fff"
+          gradientDirection="to right"
+          borderWidth="2px"
+          borderColor="#fff"
+          class="tier-box hidden left"
+        >
+          <div class="inner-box" (click)="setSlider(tier.value)">
+            <h4>Tier {{ tier.tier }}</h4>
+            <div class="requirements">
+              {{ tier.requirements }}
             </div>
-          </om-border-beam>
-        }
-        }
+            <div class="fee">{{ tier.fee }}%*</div>
+          </div>
+        </om-border-beam>
+        } }
       </div>
       <div class="detail-tier">
         Tier <span>{{ tier }}</span> <br />
@@ -368,27 +358,27 @@
   </section>
   <section id="contact" class="contact">
     @if(isBrowser) {
-      <om-retro-grid>
-        <div class="inner-section">
-          <div class="center">
-            <h2>
-              @if(isBrowser) {
-                <om-gradient-text
-                  gradientStart="#ff0266"
-                  gradientEnd="#4ecdc4"
-                  [text]="'Lets Talk'"
-                ></om-gradient-text>
-              }
-            </h2>
-
+    <om-retro-grid>
+      <div class="inner-section">
+        <div class="center">
+          <h2>
             @if(isBrowser) {
-              <om-neon-underline
-                middleColor="#60fbf1"
-                sideColor="#4ecdc4"
-              ></om-neon-underline>
+            <om-gradient-text
+              gradientStart="#ff0266"
+              gradientEnd="#4ecdc4"
+              [text]="'Lets Talk'"
+            ></om-gradient-text>
             }
-            <br />
-          </div>
+          </h2>
+
+          @if(isBrowser) {
+          <om-neon-underline
+            middleColor="#60fbf1"
+            sideColor="#4ecdc4"
+          ></om-neon-underline>
+          }
+          <br />
+        </div>
         @if(!inquirySending) { @if(inquirySuccess){
         <div class="center success">
           <img
@@ -403,7 +393,11 @@
         </div>
         } @else {
         <div class="contact-form-container">
-          <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="enhanced-form">
+          <form
+            [formGroup]="contactForm"
+            (ngSubmit)="onSubmit()"
+            class="enhanced-form"
+          >
             <div class="form-row">
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Full Name</mat-label>
@@ -416,7 +410,7 @@
                 />
                 <mat-icon matPrefix>person</mat-icon>
               </mat-form-field>
-              
+
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Email Address</mat-label>
                 <input
@@ -431,7 +425,10 @@
             </div>
 
             <div class="form-row">
-              <mat-form-field appearance="outline" class="form-field fleet-select">
+              <mat-form-field
+                appearance="outline"
+                class="form-field fleet-select"
+              >
                 <mat-label>Fleet Size</mat-label>
                 <mat-select formControlName="fleetSize">
                   <mat-option value="lt5">
@@ -460,7 +457,10 @@
             </div>
 
             <div class="form-row full-width">
-              <mat-form-field appearance="outline" class="form-field message-field">
+              <mat-form-field
+                appearance="outline"
+                class="form-field message-field"
+              >
                 <mat-label>Tell us about your needs</mat-label>
                 <textarea
                   matInput
@@ -523,47 +523,47 @@
       />
     </div>
     @if(isBrowser) {
-      <om-border-beam
-        borderRadius="12px"
-        borderWidth="4px"
-        gradientColorStart="#ff0266"
-        gradientColorEnd="#00bac9"
-        borderColor="#fff"
-        class="promo-dialog"
-      >
-        <div class="text">
-          <h2>Save up to $200 a month!</h2>
-          <p>
-            Let us give you a call and we'll get you started on Tier 2
-            immediately.
-          </p>
-          <br />
-          <mat-form-field appearance="outline">
-            <mat-label>10 Digit Phone Number</mat-label>
-            <input
-              matInput
-              [formControl]="phoneCtrl"
-              type="tel"
-              placeholder="123 456 7890"
-            />
-          </mat-form-field>
-          <!-- [error]="
+    <om-border-beam
+      borderRadius="12px"
+      borderWidth="4px"
+      gradientColorStart="#ff0266"
+      gradientColorEnd="#00bac9"
+      borderColor="#fff"
+      class="promo-dialog"
+    >
+      <div class="text">
+        <h2>Save up to $200 a month!</h2>
+        <p>
+          Let us give you a call and we'll get you started on Tier 2
+          immediately.
+        </p>
+        <br />
+        <mat-form-field appearance="outline">
+          <mat-label>10 Digit Phone Number</mat-label>
+          <input
+            matInput
+            [formControl]="phoneCtrl"
+            type="tel"
+            placeholder="123 456 7890"
+          />
+        </mat-form-field>
+        <!-- [error]="
               !phoneCtrl.touched || phoneCtrl.valid
                 ? null
                 : 'Just 10 digits please'
             " -->
-          <br />
-          <button
-            mat-raised-button
-            color="primary"
-            type="button"
-            (click)="onPromoSubmit()"
-            [disabled]="phoneCtrl.invalid || inquirySending"
-          >
-            Let's Talk
-          </button>
-        </div>
-      </om-border-beam>
+        <br />
+        <button
+          mat-raised-button
+          color="primary"
+          type="button"
+          (click)="onPromoSubmit()"
+          [disabled]="phoneCtrl.invalid || inquirySending"
+        >
+          Let's Talk
+        </button>
+      </div>
+    </om-border-beam>
     }
     <button
       class="closeBtn"

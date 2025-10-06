@@ -125,15 +125,16 @@ export class OwnersComponent extends BaseComponent {
   
   constructor() {
     super();
+    this.title.setTitle('Fumes - Owners');
+    console.log('_Images.integrations:', this._Images?.integrations);
     afterNextRender(() => {
+      this.observeHiddenElements();
       if (this.isBrowser) {
-        this.observeHiddenElements();
-        if (this.promoRef && this.promoRef.nativeElement) {
-          this.promoElem = this.promoRef.nativeElement;
-          // Dynamically import dialog-polyfill to avoid SSR issues
-          import('dialog-polyfill').then((dialogPolyfill) => {
-            dialogPolyfill.default.registerDialog(this.promoElem);
-          });
+        this.promoElem = this.promoRef.nativeElement;
+        if (localStorage.getItem('promo-dismissed') !== 'true') {
+          setTimeout(() => {
+            this.openPromo();
+          }, 3000);
         }
       }
     });
