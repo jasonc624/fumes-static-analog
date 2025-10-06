@@ -92,17 +92,13 @@ export class HeaderComponent extends BaseComponent implements OnInit {
   }
 
   switchApp(app: string) {
-    const prodUrl = 'fumes.app';
     if (this.window && this._isBrowser) {
-      const isProd = this.window.location.href.includes(prodUrl);
-      if (isProd) {
+      const isLocalhost = this.window.location.hostname === 'localhost';
+      if (!isLocalhost) {
         this.window.location.href = 'https://owner.fumes.app';
-      } else {
-        this.window.location.href = 'http://localhost:4200';
       }
     }
   }
-
   attachScrollListener() {
     if (this.window && this._isBrowser) {
       this.window.addEventListener('scroll', this.onScrollWindow.bind(this));

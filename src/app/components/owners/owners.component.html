@@ -51,7 +51,7 @@
           extended
           color="accent"
           appTrackClick="get_started_click"
-          [routerLink]="['/', 'register']"
+          (click)="goToRegister()"
           routerLinkActive="router-link-active"
         >
           <mat-icon>auto_awesome</mat-icon>
