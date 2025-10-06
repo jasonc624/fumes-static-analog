@@ -19,6 +19,10 @@ import { CommonModule, NgOptimizedImage, isPlatformBrowser } from "@angular/comm
 import { Title } from "@angular/platform-browser";
 import { BaseComponent } from "@fumes/types";
 import { Images } from "@fumes/constants";
+import { atLeast18, phoneNumberValidator } from "@fumes/validators";
+import { DirectivesModule } from "@fumes/directives";
+import { CountryStateTzComponent, CustomerFormComponent, EmailPasswordComponent } from "@fumes/forms";
+import { PhoneMaskModule } from "@fumes/phone-mask";
 import { BehaviorSubject, Observable, timer } from "rxjs";
 @Component({
   standalone: true,
@@ -39,12 +43,11 @@ import { BehaviorSubject, Observable, timer } from "rxjs";
     MatNativeDateModule,
     RouterModule,
     NgOptimizedImage,
-    // PhoneMaskModule,
-    // DirectivesModule,
-    // CustomerFormComponent,
-    // EmailPasswordComponent,
-    // CountryStateTzComponent,
-    // TrackClickDirective,
+    PhoneMaskModule,
+    DirectivesModule,
+    CustomerFormComponent,
+    EmailPasswordComponent,
+    CountryStateTzComponent
   ],
   selector: "app-register",
   templateUrl: "./register.component.html",
@@ -145,17 +148,8 @@ export class RegisterComponent extends BaseComponent implements OnInit {
   // readonly window = inject(WINDOW);
   // Fumes libs
   _Images = Images;
-  env = { production: false, owner: '' }; // Temporary environment object
-
-  // Temporary environment object
-  private environment = {
-    production: false,
-    firebase: {}
-  };
-
   constructor(
     private title: Title,
-    // private fns: Functions,
     private route: ActivatedRoute,
     private fb: FormBuilder,
     private breakpointObserver: BreakpointObserver
@@ -197,7 +191,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
             return;
           }
           this.successfullyRegistered = true;
-          const baseUrl = this.env.owner;
+          const baseUrl = import.meta.env['VITE_OWNER'] || '';
 
           if (isPlatformBrowser(this.platformId)) {
             if (this.inviteId) {
@@ -233,11 +227,33 @@ export class RegisterComponent extends BaseComponent implements OnInit {
       accountData.type = "host";
     }
 
-    // return httpsCallableData(this.fns, "create_account_with_details")(accountData);
-    // Temporary mock implementation
+    // Use current origin for API base URL
+    const apiUrl = `${window.location.origin}/api/v1/register`;
+
+    // Call the API endpoint instead of Firebase function directly
     return new Observable(observer => {
-      observer.next({ success: true });
-      observer.complete();
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(accountData)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(errorData => {
+            throw new Error(errorData.statusMessage || 'Registration failed');
+          });
+        }
+        return response.json();
+      })
+      .then(data => {
+        observer.next(data);
+        observer.complete();
+      })
+      .catch(error => {
+        observer.error(error);
+      });
     });
   }
 
@@ -271,7 +287,7 @@ export class RegisterComponent extends BaseComponent implements OnInit {
     this.confirmPasswordType = this.confirmPasswordType === "password" ? "text" : "password";
   }
   goToLogin() {
-    return `${this.env.owner}/#/auth/login`;
+    return `${import.meta.env['VITE_OWNER'] || ''}/#/auth/login`;
   }
   switchRegisterType(type: string) {
     this.registrationType = type;

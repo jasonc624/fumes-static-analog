@@ -359,6 +359,11 @@ export class OwnersComponent extends BaseComponent {
     }, 300);
   }
 
+  goToRegister(){
+    const ownerUrl = `${import.meta.env['VITE_OWNER'] || ''}/#/auth/register`;
+    window.location.href = ownerUrl;
+  }
+
   switchApp(app: string) {
     //TODO: not used?
     // this.commonService.getUrlForApp(app);
