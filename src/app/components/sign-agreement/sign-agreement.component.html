@@ -1,0 +1,60 @@
+@if(isLoading){
+<div class="backdrop"><mat-spinner></mat-spinner></div>
+} @if(authenticated) {
+<!-- Show signable agreement -->
+
+@if(agreementDocument) {
+<!-- There is an envelope -->
+@if(!agreementDocument?.isSigned){
+<div class="sequential-signing-nav">
+  <div class="inner-container">
+    <button *ngIf="!agreementsForm.valid" mat-button [disabled]="isLoading" color="accent"
+      (click)="scrollToFirstInvalidControl()">
+      Next Signature
+    </button>
+    <button *ngIf="agreementsForm.valid" mat-button [disabled]="isLoading" color="primary" (click)="submitEnvelope()">
+      Submit
+    </button>
+  </div>
+</div>
+<div class="agreement-container">
+  <!-- Rendered envelope as form -->
+  <form [formGroup]="agreementsForm">
+    <mat-stepper linear #stepper [orientation]="(stepperOrientation | async)!" formArrayName="agreements">
+      @for(agreementFormGroup of agreementsArray.controls; track $index){
+      <mat-step [editable]="false" [completed]="agreementFormGroup.valid" [hasError]="agreementFormGroup.invalid">
+        <ng-template matStepLabel>{{
+          agreementDocument.agreements_to_sign[$index].name
+          }}</ng-template>
+        <lib-generated-agreement [envelopeIdx]="$index" [parentForm]="returnFormGroup(agreementFormGroup)"
+          [preview]="false" [isSigning]="true" [vehicle]="vehicle$ | async" [customer]="customer$ | async"
+          [reservation]="reservation$ | async" [template]="agreementDocument.agreements_to_sign[$index]"
+          #agreementTpl />
+      </mat-step>
+      }
+    </mat-stepper>
+  </form>
+</div>
+} @else {
+<div class="empty-collection" style="border: none">
+  <h2>All signatures have been submitted</h2>
+  <img [src]="_Images.templates.terms" alt="Agreement Signed image" />
+</div>
+
+} } }@else {
+
+<div class="page" style="margin-top: 100px">
+  <div class="password-container">
+    <h2>You have an agreement ready for signing</h2>
+    <p>
+      Once you prove you are the designated signer, you will be shown the
+      agreement. This will be considered your intent to sign.
+    </p>
+    <input class="password-input" placeholder="Enter password from the email" data-label="Password"
+      [(ngModel)]="password" fumesInput type="password" />
+    <button [disabled]="isLoading || !password" mat-raised-button color="primary" (click)="authenticate()">
+      Request to sign
+    </button>
+  </div>
+</div>
+}

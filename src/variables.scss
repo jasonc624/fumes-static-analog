@@ -1,0 +1,193 @@
+@use '@angular/material' as mat;
+
+// Color Variables
+$app-bg: #fbfbfe;
+$primary: #ff0266;
+$secondary: #4ecdc4;
+$tertiary: #d6dbd2;
+$quadrary: #ffde03;
+$white: #fff;
+$black: #000;
+$accent: #4ecdc4;
+$warn: #ffc107;
+$success: #5ccd56;
+$danger: #d91930;
+$info: #008dd3;
+
+// Gradient Variables
+$tri-gradient: radial-gradient(circle at 11.97% 21%, $primary, transparent 59%),
+  radial-gradient(circle at 77.56% 18.89%, #ffc107, transparent 81%),
+  radial-gradient(circle at 50% 50%, $white, $white 100%);
+$app-gradient: linear-gradient(45deg, $primary, #d61f49);
+$app-danger-gradient: linear-gradient(45deg, #eb3349, $primary);
+$app-success-gradient: linear-gradient(45deg, $success, #a8e063);
+$app-warn-gradient: linear-gradient(45deg, $warn, #edde5d);
+$primary-gradient-transparent: linear-gradient(
+  90deg,
+  rgba(0, 18, 176, 0.8),
+  rgba(255, 255, 255, 0)
+);
+
+// Gray Scale Variables
+$really-light-gray: #f5f5f4;
+$light-gray: #e5e5e5;
+$medium-gray: #adadad;
+$dark-gray: #504f4f;
+$really-dark-gray: #333;
+$text-on-white: #32325d;
+
+// Typography Variables
+$primary-font: "Noto Sans", sans-serif;
+$base-font-color: #3e3e3e;
+
+// Layout Variables
+$body-background: #e0e3ee;
+$sideNavWidth: 410px;
+$coreNavWidth: 100px;
+$default-box-padding: 12px;
+
+// Breakpoint Variables
+$mobileWidth: 460px;
+$phabletWidth: 600px;
+$tabletWidth: 768px;
+$desktopWidth: 960px;
+
+// Mixins
+@mixin elevation($z) {
+  @include mat.elevation($z);
+}
+
+@mixin transition($duration, $easing, $prop) {
+  -webkit-transition: $prop $easing $duration;
+  -moz-transition: $prop $easing $duration;
+  -ms-transition: $prop $easing $duration;
+  -o-transition: $prop $easing $duration;
+  transition: $prop $easing $duration;
+}
+
+@mixin transform($prop) {
+  -webkit-transform: $prop;
+  -moz-transform: $prop;
+  -ms-transform: $prop;
+  -o-transform: $prop;
+  transform: $prop;
+}
+
+@mixin border-radius($size) {
+  -webkit-border-radius: $size;
+  -moz-border-radius: $size;
+  border-radius: $size;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+@mixin crisp-image {
+  image-rendering: -moz-crisp-edges; /* Firefox */
+  image-rendering: -o-crisp-edges; /* Opera */
+  image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming) */
+  image-rendering: crisp-edges;
+}
+
+@mixin for-size($size) {
+  @if $size == phone-only {
+    @media (max-width: $mobileWidth) {
+      @content;
+    }
+  } @else if $size == phablet-down {
+    @media (max-width: $phabletWidth) {
+      @content;
+    }
+  } @else if $size == tablet-down {
+    @media (max-width: $tabletWidth) {
+      @content;
+    }
+  } @else if $size == desktop-down {
+    @media (max-width: ( $desktopWidth)) {
+      @content;
+    }
+  } @else if $size == desktop {
+    @media (min-width: ( $tabletWidth + 1px)) {
+      @content;
+    }
+  } @else {
+    @media (min-width: $size) {
+      @content;
+    }
+  }
+}
+
+@mixin query-print {
+  @media print {
+    @content;
+  }
+}
+
+// Keyframes
+@keyframes shake {
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+@keyframes rotateX {
+  0% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(90deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(1%);
+  }
+  100% {
+    transform: translateX(-200%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rotateOut {
+  from {
+    opacity: 1;
+    transform: rotateY(0deg);
+  }
+
+  to {
+    opacity: 0;
+    transform: rotateY(-30deg);
+  }
+}

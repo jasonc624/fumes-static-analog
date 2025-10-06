@@ -1,16 +1,28 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  template: `<router-outlet />`,
+  imports: [RouterOutlet, HeaderComponent, FooterComponent],
+  template: ` 
+    <div class="app-container">
+      <app-header />
+      <main class="main-content">
+        <router-outlet />
+      </main>
+      <app-footer />
+    </div>`,
   styles: `
-    :host {
-      max-width: 1280px;
-      margin: 0 auto;
-      padding: 2rem;
-      text-align: center;
+    .app-container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .main-content {
+      flex: 1;
     }
   `,
 })
