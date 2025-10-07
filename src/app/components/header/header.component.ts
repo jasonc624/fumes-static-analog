@@ -96,6 +96,8 @@ export class HeaderComponent extends BaseComponent implements OnInit {
       const isLocalhost = this.window.location.hostname === 'localhost';
       if (!isLocalhost) {
         this.window.location.href = 'https://owner.fumes.app';
+      } else {
+        this.window.location.href = 'http://localhost:4200';
       }
     }
   }
