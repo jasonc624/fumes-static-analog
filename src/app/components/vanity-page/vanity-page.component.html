@@ -1,0 +1,293 @@
+@if(vanityPrm; as page) {
+<ng-template #defaultLogo>
+  <div class="logo-image default">
+    <h1>{{ generateLogo(page.name) }}</h1>
+  </div>
+</ng-template>
+
+<div class="rental-business-container">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    @if (page.bannerUrl && page.bannerUrl.length) {
+      <div class="hero-background" [ngStyle]="{ 'background-image': 'url(' + page.bannerUrl[0].url + ')' }"></div>
+    } @else {
+      <ng-container *ngTemplateOutlet="defaultBanner"></ng-container>
+    }
+    <div class="hero-overlay">
+      <div class="hero-content">
+        <div class="company-branding">
+          <div class="company-logo">
+            <div *ngIf="page?.logo && page?.logo?.length; else defaultLogo" class="logo-image"
+              [ngStyle]="{ 'background-image': 'url(' + page?.logo[0].url + ')' }"></div>
+          </div>
+          <div class="company-info">
+            <h1 class="company-name">{{ page?.name }}</h1>
+            <p class="company-tagline">Premium Car Rental Experience</p>
+          </div>
+        </div>
+        <div class="hero-cta">
+          <button class="cta-button primary">Book Now</button>
+          <button class="cta-button secondary">View Fleet</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Quick Info Bar -->
+    <section class="quick-info-bar">
+      <div class="info-item">
+        <div class="info-icon">🚗</div>
+        <div class="info-text">
+          <span class="info-label">Fleet Size</span>
+          <span class="info-value">{{ page?.vehicles?.length || 0 }} Vehicles</span>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">⭐</div>
+        <div class="info-text">
+          <span class="info-label">Rating</span>
+          <span class="info-value">4.9/5</span>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-icon">📍</div>
+        <div class="info-text">
+          <span class="info-label">Location</span>
+          <span class="info-value">Available Now</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Fleet Showcase -->
+    <section class="fleet-showcase">
+      <div class="section-header">
+        <h2>Our Premium Fleet</h2>
+        <p>Choose from our carefully curated selection of vehicles</p>
+      </div>
+      
+      <div class="fleet-grid">
+        @if (page?.vehicles && page.vehicles.length > 0) {
+          @for (vehicle of page.vehicles; track vehicle.id) {
+            <div class="vehicle-card" [class.featured]="$index === 0">
+              <div class="vehicle-image">
+                @if (vehicle.photos && vehicle.photos.length > 0) {
+                  <img [src]="vehicle.photos[0].url" [alt]="vehicle.details.make + ' ' + vehicle.details.model" />
+                } @else {
+                  <div class="vehicle-image-placeholder">
+                    <div class="placeholder-icon">🚗</div>
+                  </div>
+                }
+              </div>
+              <div class="vehicle-info">
+                <h3>{{ vehicle.details.year }} {{ vehicle.details.make }} {{ vehicle.details.model }}</h3>
+                <div class="vehicle-details">
+                  <span class="vehicle-type">{{ vehicle.details.category }}</span>
+                  <span class="vehicle-transmission">{{ vehicle.details.transmission === 'A' ? 'Automatic' : 'Manual' }}</span>
+                  <span class="vehicle-seats">{{ vehicle.details.seats }} seats</span>
+                  <span class="vehicle-doors">{{ vehicle.details.doors }} doors</span>
+                </div>
+                <!-- Pricing Section -->
+                <div class="vehicle-pricing">
+                  <div class="primary-price">
+                    <span class="price-amount">${{ vehicle.pricing?.daily || vehicle.dailyRate || 0 }}</span>
+                    <span class="price-period">/day</span>
+                  </div>
+                  
+                  @if (vehicle.pricing) {
+                    <div class="pricing-details">
+                      <div class="pricing-grid">
+                        <div class="pricing-item">
+                          <span class="pricing-label">Deposit</span>
+                          <span class="pricing-value">${{ vehicle.pricing.deposit }}</span>
+                        </div>
+                        <div class="pricing-item">
+                          <span class="pricing-label">Mile Allowance</span>
+                          <span class="pricing-value">{{ vehicle.pricing.mileAllowance }}/day</span>
+                        </div>
+                        <div class="pricing-item">
+                          <span class="pricing-label">Excess Mile</span>
+                          <span class="pricing-value">${{ vehicle.pricing.excessMilePrice }}/mi</span>
+                        </div>
+                        <div class="pricing-item">
+                          <span class="pricing-label">Delivery</span>
+                          <span class="pricing-value">${{ vehicle.pricing.perMileDeliveryPrice }}/mi</span>
+                        </div>
+                      </div>
+                      
+                      @if (vehicle.pricing.weeklyDiscount > 0 || vehicle.pricing.monthlyDiscount > 0) {
+                        <div class="discount-section">
+                          <h4>Discounts Available</h4>
+                          <div class="discount-grid">
+                            @if (vehicle.pricing.weeklyDiscount > 0) {
+                              <div class="discount-item">
+                                <span class="discount-label">Weekly (7+ days)</span>
+                                <span class="discount-value">{{ vehicle.pricing.weeklyDiscount }}% off</span>
+                              </div>
+                            }
+                            @if (vehicle.pricing.monthlyDiscount > 0) {
+                              <div class="discount-item">
+                                <span class="discount-label">Monthly (30+ days)</span>
+                                <span class="discount-value">{{ vehicle.pricing.monthlyDiscount }}% off</span>
+                              </div>
+                            }
+                          </div>
+                        </div>
+                      }
+                      
+                      @if (vehicle.pricing.freeDistanceDeliveryThreshold > 0) {
+                        <div class="delivery-info">
+                          <span class="delivery-note">
+                            🚚 Free delivery within {{ vehicle.pricing.freeDistanceDeliveryThreshold }} miles
+                          </span>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="vehicle-specs">
+                  <div class="spec-item">
+                    <span class="spec-label">MPG:</span>
+                    <span class="spec-value">{{ vehicle.details.mpg }}</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="spec-label">Fuel:</span>
+                    <span class="spec-value">{{ vehicle.details.gasoline }}</span>
+                  </div>
+                  <div class="spec-item">
+                    <span class="spec-label">Color:</span>
+                    <span class="spec-value">{{ vehicle.details.color }}</span>
+                  </div>
+                </div>
+                @if (vehicle.features && vehicle.features.length > 0) {
+                  <div class="vehicle-features">
+                    @for (feature of vehicle.features.slice(0, 3); track feature) {
+                      <span class="feature-tag">{{ feature }}</span>
+                    }
+                  </div>
+                }
+                <button class="vehicle-cta" [class.available]="vehicle.available">
+                  {{ vehicle.available ? 'Book Now' : 'Not Available' }}
+                </button>
+              </div>
+            </div>
+          }
+        } @else {
+          <!-- Fallback to placeholder cards when no vehicles are loaded -->
+          <div class="vehicle-card featured">
+            <div class="vehicle-image-placeholder">
+              <div class="placeholder-icon">🚗</div>
+            </div>
+            <div class="vehicle-info">
+              <h3>Premium Vehicles</h3>
+              <p>Starting from $49/day</p>
+              <button class="vehicle-cta">View Details</button>
+            </div>
+          </div>
+          <div class="vehicle-card">
+            <div class="vehicle-image-placeholder">
+              <div class="placeholder-icon">🚙</div>
+            </div>
+            <div class="vehicle-info">
+              <h3>SUVs & Trucks</h3>
+              <p>Starting from $69/day</p>
+              <button class="vehicle-cta">View Details</button>
+            </div>
+          </div>
+          <div class="vehicle-card">
+            <div class="vehicle-image-placeholder">
+              <div class="placeholder-icon">🏎️</div>
+            </div>
+            <div class="vehicle-info">
+              <h3>Luxury Cars</h3>
+              <p>Starting from $89/day</p>
+              <button class="vehicle-cta">View Details</button>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Company Details -->
+    <section class="company-details">
+      <div class="details-grid">
+        <div class="about-section">
+          <h3>About {{ page?.name }}</h3>
+          <p class="about-text">{{ page?.description || 'Your trusted partner for premium car rental services. We provide top-quality vehicles with exceptional customer service.' }}</p>
+          
+          <div class="features-list">
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <span>24/7 Customer Support</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <span>Free Cancellation</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <span>Comprehensive Insurance</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon">✓</div>
+              <span>Contactless Pickup</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="business-info">
+          <div class="info-card">
+            <h4>Business Hours</h4>
+            <div class="hours-list">
+              <div *ngFor="let item of availabilityEntries" class="hour-item">
+                <!-- <span class="day">{{ item.key }}</span>
+                <span class="time">{{ item.value }}</span> -->
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-card">
+            <h4>Get in Touch</h4>
+            <div class="contact-methods">
+              <div class="contact-item">
+                <div class="contact-icon">📞</div>
+                <span>Call for Instant Booking</span>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">💬</div>
+                <span>Live Chat Available</span>
+              </div>
+              <div class="contact-item">
+                <div class="contact-icon">📧</div>
+                <span>Email Support</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking CTA Section -->
+    <section class="booking-cta-section">
+      <div class="cta-content">
+        <h2>Ready to Hit the Road?</h2>
+        <p>Book your perfect vehicle today and experience the freedom of premium car rental</p>
+        <div class="cta-buttons">
+          <button class="cta-button primary large">Start Booking</button>
+          <button class="cta-button secondary large">Call Now</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+} @else {
+<div class="loading-screen">
+  <mat-spinner></mat-spinner>
+</div>
+}
+
+<ng-template #defaultBanner>
+  <div class="banner default"></div>
+</ng-template>
