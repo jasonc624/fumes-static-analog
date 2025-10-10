@@ -32,7 +32,7 @@
     "@fumes/directives": "^0.0.8",
     "@fumes/forms": "^0.1.9",
     "@fumes/phone-mask": "^0.0.4",
-    "@fumes/types": "^0.0.9",
+    "@fumes/types": "^0.1.1",
     "@fumes/validators": "^0.0.4",
     "@omnedia/ngx-border-beam": "^3.0.1",
     "@omnedia/ngx-connection-beam": "^3.0.0",

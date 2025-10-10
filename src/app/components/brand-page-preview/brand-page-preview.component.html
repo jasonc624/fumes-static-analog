@@ -1,0 +1,332 @@
+<!-- Template definitions must be at the top for SSR -->
+<ng-template #defaultLogo>
+  <div class="logo-image default">
+    <h1>{{ generateLogo(vanityPrm?.businessInfo?.name || '') }}</h1>
+  </div>
+</ng-template>
+
+<ng-template #defaultBanner>
+  <div class="banner default"></div>
+</ng-template>
+
+@if(vanityPrm; as page) {
+
+<div class="rental-business-container">
+  <!-- Hero Section -->
+  @if (page?.heroSection?.enabled !== false) {
+    <section class="hero-section">
+      @if (page?.businessInfo?.bannerUrl && page?.businessInfo?.bannerUrl.length) {
+        <div class="hero-background" [ngStyle]="{ 'background-image': 'url(' + page?.businessInfo?.bannerUrl[0].url + ')' }"></div>
+      } @else {
+        <ng-container *ngTemplateOutlet="defaultBanner"></ng-container>
+      }
+
+    </section>
+  }
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Quick Info Bar -->
+    @if (page?.quickInfoBar?.enabled !== false) {
+      <section class="quick-info-bar">
+        @if (page?.quickInfoBar?.items && page?.quickInfoBar.items.length > 0) {
+          @for (item of page?.quickInfoBar.items; track item.id) {
+            @if (item.enabled) {
+              <div class="info-item">
+                <div class="info-icon">{{ item.icon }}</div>
+                <div class="info-text">
+                  <span class="info-label">{{ item.label }}</span>
+                  <span class="info-value">{{ item.value }}</span>
+                </div>
+              </div>
+            }
+          }
+        } @else {
+          <!-- Default quick info items -->
+          <div class="info-item">
+            <div class="info-icon">🚗</div>
+            <div class="info-text">
+              <span class="info-label">Fleet Size</span>
+              <span class="info-value">{{ page?.vehicles?.length || 0 }} Vehicles</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">⭐</div>
+            <div class="info-text">
+              <span class="info-label">Rating</span>
+              <span class="info-value">4.9/5</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-icon">📍</div>
+            <div class="info-text">
+              <span class="info-label">Location</span>
+              <span class="info-value">Available Now</span>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Fleet Showcase -->
+    @if (page?.fleetShowcase?.enabled !== false) {
+      <section class="fleet-showcase">
+        <div class="section-header">
+          <h2>{{ page?.fleetShowcase?.sectionTitle || 'Our Premium Fleet' }}</h2>
+          <p>{{ page?.fleetShowcase?.sectionSubtitle || 'Choose from our carefully curated selection of vehicles' }}</p>
+        </div>
+        
+        <div class="fleet-grid">
+          @if (page?.vehicles && page?.vehicles.length > 0) {
+            @for (vehicle of page?.vehicles; track vehicle?.id) {
+              <div class="vehicle-card-rental" [class.featured]="$index === 0">
+                <div class="vehicle-image-section">
+                  @if (vehicle?.photos && vehicle?.photos.length > 0) {
+                    <img [src]="vehicle?.photos[0].url" [alt]="vehicle?.details.make + ' ' + vehicle?.details.model" class="vehicle-image" />
+                  } @else {
+                    <div class="vehicle-image-placeholder">
+                      <div class="placeholder-icon">🚗</div>
+                    </div>
+                  }
+                  @if (page?.fleetShowcase?.showAvailabilityBadges !== false) {
+                    <div class="availability-badge" [class.available]="vehicle?.available" [class.booked]="!vehicle?.available">
+                      @if (vehicle?.available) {
+                        <span class="availability-dot"></span>
+                        Available now
+                      } @else {
+                        <span class="availability-dot booked"></span>
+                        Booked for 08:30
+                      }
+                    </div>
+                  }
+                </div>
+                
+                <div class="vehicle-info-section">
+                  <div class="vehicle-header">
+                    @if (page?.fleetShowcase?.showBrandTags !== false) {
+                      <div class="vehicle-brand-tag">{{ vehicle?.details.make.toUpperCase() }}</div>
+                    }
+                    <h3 class="vehicle-title">{{ vehicle?.details.year }} {{ vehicle?.details.make }} {{ vehicle?.details.model }}</h3>
+                    <p class="vehicle-subtitle">{{ vehicle?.details.category }} {{ vehicle?.details.transmission }} {{ vehicle?.details.fuelType }}</p>
+                  </div>
+
+                  @if (page?.fleetShowcase?.showRatings !== false) {
+                    <div class="vehicle-rating">
+                      <div class="rating-stars">
+                        <span class="star">⭐</span>
+                        <span class="rating-value">{{ vehicle?.rating?.average || 4.8 }}</span>
+                        <span class="rating-count">{{ vehicle?.rating?.count || 50 }}</span>
+                      </div>
+                      @if (page?.fleetShowcase?.showDistance !== false && vehicle?.location) {
+                        <div class="vehicle-distance">
+                          <span class="distance-icon">📍</span>
+                          <span class="distance-text">{{ vehicle?.location.distance }} {{ vehicle?.location.unit }}</span>
+                        </div>
+                      }
+                    </div>
+                  }
+
+                  @if (page?.fleetShowcase?.showTransmissionType !== false) {
+                    <div class="vehicle-specs">
+                      <div class="spec-badge transmission">
+                        <span class="spec-icon">⚙️</span>
+                        <span class="spec-text">{{ vehicle?.details.transmission }}</span>
+                      </div>
+                      <div class="spec-badge category">
+                        <span class="spec-icon">🚗</span>
+                        <span class="spec-text">{{ vehicle?.details.category }}</span>
+                      </div>
+                    </div>
+                  }
+
+                  @if (page?.fleetShowcase?.showPricing !== false && vehicle?.pricing) {
+                    <div class="vehicle-pricing">
+                      <div class="price-display">
+                        <span class="currency">{{ vehicle?.pricing.currency === 'USD' ? '$' : vehicle?.pricing.currency }}</span>
+                        <span class="price-amount">{{ vehicle?.pricing.dailyRate }}</span>
+                        <span class="price-period">/Day</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          } @else if (page?.fleetShowcase?.showPlaceholderCards !== false) {
+            @if (page?.fleetShowcase?.placeholderCategories && page?.fleetShowcase.placeholderCategories.length > 0) {
+              @for (category of page?.fleetShowcase.placeholderCategories; track category.id) {
+                @if (category.enabled) {
+                  <div class="vehicle-card" [class.featured]="$index === 0">
+                    <div class="vehicle-image-placeholder">
+                      <div class="placeholder-icon">{{ category.icon }}</div>
+                    </div>
+                    <div class="vehicle-info">
+                      <h3>{{ category.title }}</h3>
+                      <p>{{ category.subtitle }}</p>
+                      <button class="vehicle-cta">View Details</button>
+                    </div>
+                  </div>
+                }
+              }
+            } @else {
+              <!-- Default fallback placeholder cards -->
+              <div class="vehicle-card featured">
+                <div class="vehicle-image-placeholder">
+                  <div class="placeholder-icon">🚗</div>
+                </div>
+                <div class="vehicle-info">
+                  <h3>Premium Vehicles</h3>
+                  <p>Starting from $49/day</p>
+                  <button class="vehicle-cta">View Details</button>
+                </div>
+              </div>
+              <div class="vehicle-card">
+                <div class="vehicle-image-placeholder">
+                  <div class="placeholder-icon">🚙</div>
+                </div>
+                <div class="vehicle-info">
+                  <h3>SUVs & Trucks</h3>
+                  <p>Starting from $69/day</p>
+                  <button class="vehicle-cta">View Details</button>
+                </div>
+              </div>
+              <div class="vehicle-card">
+                <div class="vehicle-image-placeholder">
+                  <div class="placeholder-icon">🏎️</div>
+                </div>
+                <div class="vehicle-info">
+                  <h3>Luxury Cars</h3>
+                  <p>Starting from $89/day</p>
+                  <button class="vehicle-cta">View Details</button>
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Company Details -->
+    @if (page?.companyDetails?.enabled !== false) {
+      <section class="company-details">
+        <div class="details-grid">
+          @if (page?.companyDetails?.aboutSection?.enabled !== false) {
+            <div class="about-section">
+              <h3>{{ page?.companyDetails?.aboutSection?.title || 'About ' + (page?.businessInfo?.name || 'Us') }}</h3>
+              <p class="about-text">{{ page?.companyDetails?.aboutSection?.customDescription || page?.businessInfo?.description || 'Your trusted partner for premium car rental services. We provide top-quality vehicles with exceptional customer service.' }}</p>
+              
+              @if (page?.companyDetails?.aboutSection?.showFeaturesList !== false) {
+                <div class="features-list">
+                  @if (page?.companyDetails?.aboutSection?.customFeatures && page?.companyDetails.aboutSection.customFeatures.length > 0) {
+                    @for (feature of page?.companyDetails.aboutSection.customFeatures; track $index) {
+                      <div class="feature-item">
+                        <div class="feature-icon">✓</div>
+                        <span>{{ feature }}</span>
+                      </div>
+                    }
+                  } @else {
+                    <!-- Default features -->
+                    <div class="feature-item">
+                      <div class="feature-icon">✓</div>
+                      <span>24/7 Customer Support</span>
+                    </div>
+                    <div class="feature-item">
+                      <div class="feature-icon">✓</div>
+                      <span>Free Cancellation</span>
+                    </div>
+                    <div class="feature-item">
+                      <div class="feature-icon">✓</div>
+                      <span>Comprehensive Insurance</span>
+                    </div>
+                    <div class="feature-item">
+                      <div class="feature-icon">✓</div>
+                      <span>Contactless Pickup</span>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+
+          <div class="business-info">
+            @if (page?.companyDetails?.businessHours?.enabled !== false) {
+              <div class="info-card">
+                <h4>{{ page?.companyDetails?.businessHours?.title || 'Business Hours' }}</h4>
+                <div class="hours-list">
+                  <div *ngFor="let item of availabilityEntries" class="hour-item">
+                    <span class="day">{{ item[0] }}</span>
+                    <span class="time">{{ item[1] }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (page?.companyDetails?.contactInfo?.enabled !== false) {
+              <div class="contact-card">
+                <h4>{{ page?.companyDetails?.contactInfo?.title || 'Get in Touch' }}</h4>
+                <div class="contact-methods">
+                  @if (page?.companyDetails?.contactInfo?.customContactMethods && page?.companyDetails.contactInfo.customContactMethods.length > 0) {
+                    @for (method of page?.companyDetails.contactInfo.customContactMethods; track method.id) {
+                      @if (method.enabled) {
+                        <div class="contact-item">
+                          <div class="contact-icon">{{ method.icon }}</div>
+                          <span>{{ method.label }}</span>
+                        </div>
+                      }
+                    }
+                  } @else {
+                    <!-- Default contact methods -->
+                    @if (page?.companyDetails?.contactInfo?.showPhone !== false) {
+                      <div class="contact-item">
+                        <div class="contact-icon">📞</div>
+                        <span>Call for Instant Booking</span>
+                      </div>
+                    }
+                    @if (page?.companyDetails?.contactInfo?.showLiveChat !== false) {
+                      <div class="contact-item">
+                        <div class="contact-icon">💬</div>
+                        <span>Live Chat Available</span>
+                      </div>
+                    }
+                    @if (page?.companyDetails?.contactInfo?.showEmail !== false) {
+                      <div class="contact-item">
+                        <div class="contact-icon">📧</div>
+                        <span>Email Support</span>
+                      </div>
+                    }
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Booking CTA Section -->
+    @if (page?.bookingCTA?.enabled !== false) {
+      <section class="booking-cta-section">
+        <div class="cta-content">
+          <h2>{{ page?.bookingCTA?.title || 'Ready to Hit the Road?' }}</h2>
+          <p>{{ page?.bookingCTA?.subtitle || 'Book your perfect vehicle today and experience the freedom of premium car rental' }}</p>
+          <div class="cta-buttons">
+            <button class="cta-button primary large">{{ page?.bookingCTA?.primaryButtonText || 'Start Booking' }}</button>
+            @if (page?.bookingCTA?.showSecondaryButton !== false) {
+              <button class="cta-button secondary large">{{ page?.bookingCTA?.secondaryButtonText || 'Call Now' }}</button>
+            }
+          </div>
+        </div>
+      </section>
+    }
+  </main>
+</div>
+} @else {
+<div class="loading-screen">
+  <mat-spinner></mat-spinner>
+</div>
+} 
+
+<!-- @else {
+  <div class="loading-screen">
+    <div class="spinner">Loading...</div>
+  </div>
+} -->
