@@ -5,22 +5,7 @@ import { injectLoad, RouteMeta } from '@analogjs/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import { BrandPagePreviewComponent } from '../../components/brand-page-preview/brand-page-preview.component';
-import { VanityPageComponent as VanityPage } from '../../components/vanity-page/vanity-page.component';
-
-
-// Define the Document interface based on vanity page structure
-export interface Document {
-  id?: string;
-  name: string;
-  description: string;
-  bannerUrl?: Array<{ url: string }>;
-  logo?: Array<{ url: string }>;
-  vehicles?: any[];
-  fleetRef?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
+import {BrandPageComponent} from '@fumes/brand-page';
 // Route metadata for SEO
 export const routeMeta: RouteMeta = {
   title: 'Vanity Page Details',
@@ -35,14 +20,11 @@ export const routeMeta: RouteMeta = {
 @Component({
   selector: 'app-vanity-page',
   standalone: true,
-  imports: [CommonModule,VanityPage, BrandPagePreviewComponent],
+  imports: [CommonModule, BrandPagePreviewComponent, BrandPageComponent],
   template: `
     @if (document(); as page) {
-      <vanity-page 
-        [vanityPrm]="page" 
-        [availability]="availability">
-      </vanity-page>
       <!-- <app-brand-page-preview [vanityPrm]="page"></app-brand-page-preview> -->
+       <lib-brand-page [vanityPrm]="page"></lib-brand-page>
     } @else {
       <div class="loading-screen">
         <div class="spinner">Loading...</div>

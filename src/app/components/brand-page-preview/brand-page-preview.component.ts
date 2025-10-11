@@ -11,9 +11,16 @@ import { VanityPage } from '../../models/vanity-page.model';
   imports: [CommonModule, MatProgressSpinnerModule]
 })
 export class BrandPagePreviewComponent {
-  @Input() vanityPrm: VanityPage | null = null;
+  @Input() vanityPrm: any | null = null;
+  
+  // Tab management
+  activeTab: string = 'rent';
   
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  
+  setActiveTab(tab: string): void {
+    this.activeTab = tab;
+  }
   
 
   get businessHours(): any | undefined {
