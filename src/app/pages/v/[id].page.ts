@@ -24,7 +24,7 @@ export const routeMeta: RouteMeta = {
   template: `
     @if (document(); as page) {
       <!-- <app-brand-page-preview [vanityPrm]="page"></app-brand-page-preview> -->
-       <lib-brand-page [vanityPrm]="page"></lib-brand-page>
+       <lib-brand-page [vanityPrm]="page" [isPreview]="false"></lib-brand-page>
     } @else {
       <div class="loading-screen">
         <div class="spinner">Loading...</div>
