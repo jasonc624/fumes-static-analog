@@ -1,0 +1,833 @@
+$padding: 25px;
+
+// Responsive mixin
+@mixin for-size($size) {
+  @if $size == phone-only {
+    @media (max-width: 460px) {
+      @content;
+    }
+  } @else if $size == phablet-down {
+    @media (max-width: 600px) {
+      @content;
+    }
+  } @else if $size == tablet-down {
+    @media (max-width: 768px) {
+      @content;
+    }
+  } @else if $size == desktop-down {
+    @media (max-width: 960px) {
+      @content;
+    }
+  } @else if $size == desktop {
+    @media (min-width: 769px) {
+      @content;
+    }
+  } @else {
+    @media (min-width: $size) {
+      @content;
+    }
+  }
+}
+
+// Modern Car Rental Business Design
+.rental-business-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+}
+
+// Hero Section
+.hero-section {
+  position: relative;
+  height: 70vh;
+  min-height: 500px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.7);
+    background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234ecdc4' fill-opacity='1'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+
+  .hero-overlay {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 60px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .company-branding {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+
+        .company-logo {
+          .logo-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+
+            &.default {
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: #4ecdc4;
+              color: #0d3a37;
+              font-size: 24px;
+              font-weight: 700;
+
+              h1 {
+                margin: 0;
+                font-size: 24px;
+              }
+            }
+          }
+        }
+
+        .company-info {
+          .company-name {
+            font-size: 3rem;
+            font-weight: 700;
+            color: white;
+            margin: 0 0 8px 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+          }
+
+          .company-tagline {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin: 0;
+            font-weight: 300;
+          }
+        }
+      }
+
+      .hero-cta {
+        display: flex;
+        gap: 16px;
+        flex-direction: column;
+
+        @include for-size(tablet-down) {
+          flex-direction: row;
+        }
+      }
+    }
+  }
+}
+
+// CTA Buttons
+.cta-button {
+  padding: 16px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+  }
+
+  &.secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  &.large {
+    padding: 20px 40px;
+    font-size: 1.1rem;
+  }
+}
+
+// Main Content
+.main-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+// Quick Info Bar
+.quick-info-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin: -60px 0 60px 0;
+  position: relative;
+  z-index: 3;
+
+  .info-item {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-4px);
+    }
+
+    .info-icon {
+      font-size: 2rem;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      color: white;
+    }
+
+    .info-text {
+      display: flex;
+      flex-direction: column;
+
+      .info-label {
+        font-size: 0.9rem;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .info-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #333;
+      }
+    }
+  }
+}
+
+// Fleet Showcase
+.fleet-showcase {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 60px;
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #64748b;
+    }
+  }
+
+  .loading-vehicles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    
+    p {
+      margin-top: 20px;
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+  }
+
+  .fleet-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+
+    .vehicle-card {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      }
+
+      &.featured {
+        border: 2px solid #3b82f6;
+        transform: scale(1.02);
+      }
+
+      .vehicle-image {
+        height: 200px;
+        overflow: hidden;
+        position: relative;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s ease;
+        }
+
+        &:hover img {
+          transform: scale(1.05);
+        }
+      }
+
+      .vehicle-image-placeholder {
+        height: 200px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .placeholder-icon {
+          font-size: 3rem;
+          opacity: 0.8;
+        }
+      }
+
+      .vehicle-info {
+        padding: 25px;
+
+        h3 {
+          font-size: 1.4rem;
+          font-weight: 600;
+          color: #1a202c;
+          margin-bottom: 12px;
+        }
+
+        .vehicle-details {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 15px;
+
+          span {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 500;
+          }
+        }
+
+        .vehicle-price {
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #3b82f6;
+          margin-bottom: 15px;
+        }
+
+        .vehicle-pricing {
+          margin-bottom: 20px;
+
+          .primary-price {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-bottom: 16px;
+
+            .price-amount {
+              font-size: 1.5rem;
+              font-weight: 700;
+              color: #3b82f6;
+            }
+
+            .price-period {
+              font-size: 1rem;
+              color: #64748b;
+              font-weight: 500;
+            }
+          }
+
+          .pricing-details {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+
+            .pricing-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 12px;
+              margin-bottom: 16px;
+
+              .pricing-item {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 12px;
+                background: white;
+                border-radius: 8px;
+                border: 1px solid #e2e8f0;
+
+                .pricing-label {
+                  font-size: 0.85rem;
+                  color: #64748b;
+                  font-weight: 500;
+                }
+
+                .pricing-value {
+                  font-size: 0.9rem;
+                  font-weight: 600;
+                  color: #1e293b;
+                }
+              }
+            }
+
+            .discount-section {
+              margin-bottom: 16px;
+
+              h4 {
+                font-size: 0.9rem;
+                font-weight: 600;
+                color: #059669;
+                margin-bottom: 8px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+
+                &::before {
+                  content: "🎉";
+                  font-size: 0.8rem;
+                }
+              }
+
+              .discount-grid {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+
+                .discount-item {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  padding: 6px 12px;
+                  background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+                  border-radius: 6px;
+                  border: 1px solid #a7f3d0;
+
+                  .discount-label {
+                    font-size: 0.8rem;
+                    color: #065f46;
+                    font-weight: 500;
+                  }
+
+                  .discount-value {
+                    font-size: 0.85rem;
+                    font-weight: 700;
+                    color: #059669;
+                  }
+                }
+              }
+            }
+
+            .delivery-info {
+              .delivery-note {
+                display: block;
+                font-size: 0.85rem;
+                color: #7c3aed;
+                background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+                padding: 8px 12px;
+                border-radius: 8px;
+                border: 1px solid #c4b5fd;
+                text-align: center;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+
+        .vehicle-specs {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+          gap: 8px;
+          margin-bottom: 15px;
+          padding: 12px;
+          background: #f8fafc;
+          border-radius: 8px;
+
+          .spec-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+
+            .spec-label {
+              font-size: 0.75rem;
+              color: #64748b;
+              font-weight: 500;
+              margin-bottom: 2px;
+            }
+
+            .spec-value {
+              font-size: 0.85rem;
+              color: #1e293b;
+              font-weight: 600;
+            }
+          }
+        }
+
+        .vehicle-features {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-bottom: 20px;
+
+          .feature-tag {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 500;
+          }
+        }
+
+        p {
+          color: #64748b;
+          margin-bottom: 20px;
+          line-height: 1.6;
+        }
+
+        .vehicle-cta {
+          width: 100%;
+          padding: 12px 24px;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+          }
+
+          &:not(.available) {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            cursor: not-allowed;
+
+            &:hover {
+              transform: none;
+              box-shadow: none;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Company Details
+.company-details {
+  margin: 80px 0;
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 48px;
+
+    @include for-size(tablet-down) {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .about-section {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+      h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin: 0 0 24px 0;
+      }
+
+      .about-text {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #555;
+        margin: 0 0 32px 0;
+      }
+
+      .features-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+
+        .feature-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .feature-icon {
+            width: 24px;
+            height: 24px;
+            background: #4ecdc4;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+          }
+
+          span {
+            font-weight: 500;
+            color: #333;
+          }
+        }
+      }
+    }
+
+    .business-info {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      .info-card,
+      .contact-card {
+        background: white;
+        padding: 32px;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+        h4 {
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #333;
+          margin: 0 0 20px 0;
+        }
+      }
+
+      .hours-list {
+        .hour-item {
+          display: flex;
+          justify-content: space-between;
+          padding: 8px 0;
+          border-bottom: 1px solid #f0f0f0;
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          .day {
+            font-weight: 600;
+            color: #333;
+          }
+
+          .time {
+            color: #666;
+          }
+        }
+      }
+
+      .contact-methods {
+        .contact-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 0;
+
+          .contact-icon {
+            font-size: 1.2rem;
+          }
+
+          span {
+            font-weight: 500;
+            color: #333;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Booking CTA Section
+.booking-cta-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin: 80px -20px 0 -20px;
+  padding: 80px 20px;
+  text-align: center;
+
+  .cta-content {
+    max-width: 600px;
+    margin: 0 auto;
+
+    h2 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: white;
+      margin: 0 0 16px 0;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      margin: 0 0 40px 0;
+      line-height: 1.6;
+    }
+
+    .cta-buttons {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+
+      @include for-size(phone-only) {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .cta-button {
+        &.primary {
+          background: white;
+          color: #667eea;
+
+          &:hover {
+            background: #f8f9ff;
+          }
+        }
+
+        &.secondary {
+          background: transparent;
+          border: 2px solid white;
+          color: white;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Loading Screen
+.loading-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  width: 100dvw;
+  height: 100dvh;
+  z-index: 9999;
+}
+
+// Responsive Design
+@include for-size(tablet-down) {
+  .hero-section {
+    height: 60vh;
+    min-height: 400px;
+
+    .hero-content {
+      flex-direction: column;
+      text-align: center;
+      gap: 32px;
+
+      .company-branding {
+        flex-direction: column;
+        text-align: center;
+
+        .company-info .company-name {
+          font-size: 2.5rem;
+        }
+      }
+
+      .hero-cta {
+        flex-direction: row;
+        justify-content: center;
+      }
+    }
+  }
+
+  .quick-info-bar {
+    margin: -40px 0 40px 0;
+  }
+
+  .fleet-showcase .fleet-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@include for-size(phone-only) {
+  .hero-section .hero-content {
+    padding: 40px 20px;
+
+    .company-branding .company-info .company-name {
+      font-size: 2rem;
+    }
+
+    .hero-cta {
+      flex-direction: column;
+      width: 100%;
+    }
+  }
+
+  .quick-info-bar {
+    grid-template-columns: 1fr;
+    margin: -30px 0 30px 0;
+  }
+
+  .company-details .details-grid {
+    .about-section,
+    .info-card,
+    .contact-card {
+      padding: 24px;
+    }
+  }
+}

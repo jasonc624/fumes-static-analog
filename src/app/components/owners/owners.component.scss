@@ -830,7 +830,7 @@ section {
         margin-top: 2rem;
 
         .submit-button {
-          background: linear-gradient(135deg, $primary-color 0%, darken($primary-color, 10%) 100%);
+          background: linear-gradient(135deg, $primary-color 0%, color.scale($primary-color, $lightness: -10%) 100%);
           color: white;
           padding: 12px 32px;
           font-size: 16px;
@@ -849,7 +849,7 @@ section {
           &:hover:not([disabled]) {
             transform: translateY(-3px);
             box-shadow: 0 12px 35px rgba($primary-color, 0.4);
-            background: linear-gradient(135deg, lighten($primary-color, 5%) 0%, $primary-color 100%);
+            background: linear-gradient(135deg, color.scale($primary-color, $lightness: 5%) 0%, $primary-color 100%);
           }
 
           &:active:not([disabled]) {
