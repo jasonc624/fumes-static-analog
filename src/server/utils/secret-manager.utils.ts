@@ -6,8 +6,8 @@ export class SecretManager {
 
   constructor(projectId?: string) {
     // Handle different credential sources for different environments
-    const credentialsJson = process.env['GOOGLE_APPLICATION_CREDENTIALS_JSON'];
-    const credentialsPath = process.env['GOOGLE_APPLICATION_CREDENTIALS'];
+    const credentialsJson = import.meta.env['GOOGLE_APPLICATION_CREDENTIALS_JSON'];
+    const credentialsPath = import.meta.env['GOOGLE_APPLICATION_CREDENTIALS'];
     
     if (credentialsJson) {
       // Parse JSON credentials (for Vercel/cloud deployment)
