@@ -8,20 +8,17 @@ import {
   ViewChild,
   PLATFORM_ID,
   inject,
+  computed,
 } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-// Material
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialogModule, MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
-import { Observable, of, switchMap, takeUntil, tap } from "rxjs";
+import { of, switchMap, takeUntil, map } from 'rxjs';
 
 // Fumes libs
-import { BaseComponent, Booking, Fleet } from "@fumes/types";
+import { BaseComponent, Booking } from '@fumes/types';
 import { ConversationComponent } from '@fumes/conversation';
 import { memoizer } from '@fumes/memoize';
 import { FumesMapComponent } from '@fumes/fumes-map';
@@ -31,21 +28,18 @@ import { environment } from '../../config/environment';
 import { BookingService } from '../../services/booking.service';
 import { StripePaymentService } from '../../services/stripe-payment.service';
 import { WINDOW } from '../../tokens/window.token';
+import { VehicleGuideDialogComponent } from './vehicle-guide-dialog.component';
 
 @Component({
   standalone: true,
   imports: [
     CommonModule,
-    MatTabsModule,
-    MatButtonModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatIconModule,
     RouterModule,
     ConversationComponent,
     PricingBreakdownComponent,
     FumesMapComponent,
-    MatProgressSpinnerModule,
+    MatIconModule,
+    MatDialogModule,
   ],
   selector: 'app-manage-booking',
   templateUrl: './manage-booking.component.html',
@@ -60,7 +54,8 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
     @Inject(DOCUMENT) private document: Document,
     private activeRoute: ActivatedRoute,
     private bookingService: BookingService,
-    private stripePaymentService: StripePaymentService
+    private stripePaymentService: StripePaymentService,
+    private dialog: MatDialog
   ) {
     super();
     this.isBrowser = isPlatformBrowser(this.platformId);
@@ -68,10 +63,63 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
   isBrowser: boolean = false;
   // Tabs
   selectedTabIndex = 0;
+  activeTab = 'trip-details';
+  tabs = [
+    { id: 'trip-details', label: 'Trip Details' },
+    { id: 'messages', label: 'Messages' },
+    { id: 'payment', label: 'Payment' }
+  ];
   env = environment;
-  booking$!: Observable<Partial<Booking> | any>;
-  booking_obj!: Booking;
-  fleet!: Fleet; //shallow version of fleet that conversation component needs
+
+  // Vehicle guide data
+  vehicleGuide = {
+    about: null,
+    questions: "<p><strong>What is the meaning of life?</strong><br>to live it to the fullest</p>",
+    greeting: "<p>Thank you for booking with me. I hope to make this as smooth as possible</p>",
+    directions: "<p>Please be careful, this car is open to the elements so check the weather before departure. This is a quick release steering wheel and it's meant to take with you but I advise you to put it in the compartment behind the seat with lock to avoid theft. If we are unable to meet for key hand off, please leave the key in the lockbox and lock it on one of the seatbelts. Please don't be a child and ruin the tires by burning out. Ruins it for every other responsible driver. When exiting, hold on to the steering wheel and e brake and exit butt first. This helps not put unnecessary strain on the plastic.</p>"
+  };
+
+  // Signals for booking data
+  private readonly bookingResponse = toSignal(
+    this.activeRoute.queryParamMap.pipe(
+      switchMap((queryParams: any) => {
+        const pw = queryParams.get('pw');
+        
+        if (!pw) {
+          return of(null);
+        }
+        
+        // Try to get bookingId from query params first, then from route params
+        let bookingId = queryParams.get('bookingId');
+        
+        if (!bookingId) {
+          // Get from route params via parent route
+          const routeBookingId = this.activeRoute.parent?.snapshot.paramMap.get('bookingId') || 
+                                this.activeRoute.snapshot.paramMap.get('bookingId');
+          bookingId = routeBookingId || this.bookingId;
+        }
+        
+        if (!bookingId) {
+          return of(null);
+        }
+        
+        return this.bookingService.authenticateToManageBooking(bookingId, pw);
+      }),
+      map((response: any) => {
+        // Handle the API response structure {success: true, data: Booking}
+        if (response && response.success && response.data) {
+          return response.data;
+        }
+        return response?.data || null;
+      })
+    ),
+    { initialValue: null }
+  );
+
+  // Computed signals for easy access
+  booking = computed(() => this.bookingResponse());
+  fleet = computed(() => this.booking()?.fleet);
+  booking_obj = computed(() => this.booking());
   // Payment Dialog
   paymentDialogElement!: HTMLDialogElement;
   @ViewChild('paymentDialog', { read: ElementRef }) paymentDialog: any;
@@ -88,32 +136,47 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
   // scroll
 
   override ngOnInit(): void {
-    console.log('manage booking');
-    this.booking$ = this.activeRoute.queryParamMap.pipe(
-      takeUntil(this.destroyed),
-      switchMap((queryParams: any) => {
-        const pw = queryParams.get('pw');
-        if (!this.bookingId || !pw) {
-          return of(null);
-        }
-        return this.bookingService.authenticateToManageBooking(
-          this.bookingId,
-          pw
-        );
-      }),
-      tap(async (response: any) => {
-        if (!response) return;
-        // Extract booking data from the API response
-        const booking = response.data;
-        this.fleet = booking.fleet;
-        this.booking_obj = booking;
-        await this.initModal();
-      })
-    );
+    // Initialize modal when booking data is available
+    this.initModalWhenReady();
+  }
+
+  private async initModalWhenReady(): Promise<void> {
+    // Wait for booking data to be available
+    const checkBooking = () => {
+      const booking = this.booking();
+      if (booking) {
+        this.initModal();
+      } else {
+        // Check again after a short delay
+        setTimeout(checkBooking, 100);
+      }
+    };
+    checkBooking();
   }
 
   goToTab(index: number): void {
     this.selectedTabIndex = index;
+    this.activeTab = this.tabs[index].id;
+    
+    // When switching to Messages tab, adjust chat container
+    if (index === 1) {
+      setTimeout(() => {
+        this.setConvoContainerHeight();
+        this.scrollToBottom();
+      }, 100);
+    }
+  }
+
+  setConvoContainerHeight(): void {
+    if (this.conversation) {
+      this.conversation.setConvoContainerHeight();
+    }
+  }
+
+  scrollToBottom(): void {
+    if (this.conversation) {
+      this.conversation.scrollToBottom();
+    }
   }
   onTabChange() {
     this.conversation.setConvoContainerHeight();
@@ -236,11 +299,14 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
       const dialogPolyfill = await import('dialog-polyfill');
       dialogPolyfill.default.registerDialog(this.paymentDialogElement);
       await this.loadStripeConditionally();
-      this.intentHandler(this.booking_obj.customer)
-        .pipe(takeUntil(this.destroyed))
-        .subscribe((intent) => {
-          this.mountCard(intent);
-        });
+      const booking = this.booking();
+      if (booking?.customer) {
+        this.intentHandler(booking.customer)
+          .pipe(takeUntil(this.destroyed))
+          .subscribe((intent) => {
+            this.mountCard(intent);
+          });
+      }
     }
   }
   openDateChangeDialog(): void {
@@ -253,4 +319,95 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
       this.paymentDialogElement.close();
     }
   }
-}
+
+  // Custom tab methods
+  setActiveTab(tabId: string): void {
+    this.activeTab = tabId;
+  }
+
+  isTabActive(tabId: string): boolean {
+    return this.activeTab === tabId;
+  }
+
+  // Contact action methods
+  callHost(): void {
+    const fleet = this.fleet();
+    if (fleet?.owner?.phone) {
+      window.location.href = `tel:+1${fleet.owner.phone}`;
+    }
+  }
+
+  emailHost(): void {
+    const fleet = this.fleet();
+    if (fleet?.owner?.email) {
+      window.location.href = `mailto:${fleet.owner.email}`;
+    }
+  }
+
+  chatWithHost(): void {
+    // Switch to Messages tab (index 1)
+    this.goToTab(1);
+  }
+
+  // Payment dialog methods
+  openPaymentDialog(): void {
+    if (isPlatformBrowser(this.platformId) && this.paymentDialogElement) {
+      this.paymentDialogElement.showModal();
+    }
+  }
+
+  closePaymentDialog(): void {
+    if (isPlatformBrowser(this.platformId) && this.paymentDialogElement) {
+      this.paymentDialogElement.close();
+    }
+  }
+
+  // Map link method
+  openMapLocation(location: string): void {
+    if (location) {
+      const encodedLocation = encodeURIComponent(location);
+      const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedLocation}`;
+      window.open(mapsUrl, '_blank');
+    }
+  }
+
+  // Vehicle Guide Dialog Methods
+  openGreetingDialog(): void {
+    this.dialog.open(VehicleGuideDialogComponent, {
+      data: {
+        title: 'Welcome Message',
+        icon: 'waving_hand',
+        content: this.vehicleGuide.greeting
+      },
+      panelClass: 'vehicle-guide-dialog',
+      autoFocus: false,
+      restoreFocus: false
+    });
+  }
+
+  openDirectionsDialog(): void {
+    this.dialog.open(VehicleGuideDialogComponent, {
+      data: {
+        title: 'Vehicle Instructions',
+        icon: 'directions_car',
+        content: this.vehicleGuide.directions
+      },
+      panelClass: 'vehicle-guide-dialog',
+      autoFocus: false,
+      restoreFocus: false
+    });
+  }
+
+  openQuestionsDialog(): void {
+    this.dialog.open(VehicleGuideDialogComponent, {
+      data: {
+        title: 'Frequently Asked Questions',
+        icon: 'help_outline',
+        content: this.vehicleGuide.questions
+      },
+      panelClass: 'vehicle-guide-dialog',
+      autoFocus: false,
+      restoreFocus: false
+    });
+   }
+ }

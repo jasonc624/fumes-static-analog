@@ -1,0 +1,8 @@
+<div class="dialog-header">
+  <mat-icon class="dialog-icon" [ngClass]="getIconClass()">{{ data.icon }}</mat-icon>
+  <h2 class="dialog-title">{{ data.title }}</h2>
+  <button class="close-button" (click)="close()" aria-label="Close dialog">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+<div class="dialog-content" [innerHTML]="data.content"></div>
