@@ -44,3 +44,5 @@ testem.log
 Thumbs.db
 # Environment variables
 .env
+secret-manager-key.json
+secret-manager-key-prod.json

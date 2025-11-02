@@ -11,6 +11,12 @@ import {
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { provideFileRouter, requestContextInterceptor } from '@analogjs/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getFunctions, provideFunctions } from '@angular/fire/functions';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
+import { environment } from './config/environment';
+import { LIB_ENV } from '@fumes/services';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimations(),
@@ -22,5 +28,11 @@ export const appConfig: ApplicationConfig = {
     ),
     provideClientHydration(withEventReplay()),
     provideZonelessChangeDetection(),
+    // Firebase providers for client-side
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideFirestore(() => getFirestore()),
+    provideFunctions(() => getFunctions()),
+    // Environment provider for @fumes/services
+    { provide: LIB_ENV, useValue: environment },
   ],
 };
