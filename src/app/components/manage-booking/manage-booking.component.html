@@ -15,7 +15,7 @@
           {{ booking.vehicle.details?.trim }}
         </div>
         <div class="stats">
-          <fumes-vehicle-stats [vehicle]="booking.vehicle"></fumes-vehicle-stats>
+          <!-- <fumes-vehicle-stats [vehicle]="booking.vehicle"></fumes-vehicle-stats> -->
           <button [disabled]="isLoadingVerification" mat-button color="accent"
             (click)="createVerificationSession(booking)">
             Verify Driver's License
@@ -109,12 +109,12 @@
         </div>
         <!-- Map -->
         <div class="location-map">
-          <lib-fumes-map id="pickupLocation" [zoom]="18" [environment]="env" [startingGeoPoint]="{
+          <!-- <lib-fumes-map id="pickupLocation" [zoom]="18" [environment]="env" [startingGeoPoint]="{
               lat: booking.reservation.pickupLocation.location.geopoint
                 .latitude,
               lon: booking.reservation.pickupLocation.location.geopoint
                 .longitude
-            }" [mapType]="'point'" [disableZoom]="false" [disablePan]="false"></lib-fumes-map>
+            }" [mapType]="'point'" [disableZoom]="false" [disablePan]="false"></lib-fumes-map> -->
         </div>
         <!-- Owner -->
         <h3>Contact</h3>

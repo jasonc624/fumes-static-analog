@@ -1,43 +1,41 @@
-import { CommonModule, DOCUMENT, isPlatformBrowser } from "@angular/common";
+import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common';
 import {
   Component,
   ElementRef,
   Inject,
+  Input,
   OnInit,
   ViewChild,
   PLATFORM_ID,
   inject,
-} from "@angular/core";
-import { Functions, httpsCallableData } from "@angular/fire/functions";
-import { ActivatedRoute, RouterModule } from "@angular/router";
+} from '@angular/core';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 // Material
-import { MatButtonModule } from "@angular/material/button";
-import { MatFormFieldModule } from "@angular/material/form-field";
-import { MatIconModule } from "@angular/material/icon";
-import { MatInputModule } from "@angular/material/input";
-import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { MatTabsModule } from "@angular/material/tabs";
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTabsModule } from '@angular/material/tabs';
 
 import { Observable, of, switchMap, takeUntil, tap } from "rxjs";
 
-import { environment } from "../../environments/environment";
-import {
-  CommonService,
-  StripePaymentService,
-} from "@fumes/services";
 // Fumes libs
 import { BaseComponent, Booking, Fleet } from "@fumes/types";
-import { ConversationComponent } from "@fumes/conversation";
-import { memoizer } from "@fumes/memoize";
-import { FumesMapComponent } from "@fumes/fumes-map";
-import { PricingBreakdownComponent } from "@fumes/booking-breakdown";
-import { VehicleStatsComponent } from "@fumes/vehicle-list";
+import { ConversationComponent } from '@fumes/conversation';
+import { memoizer } from '@fumes/memoize';
+import { FumesMapComponent } from '@fumes/fumes-map';
+import { PricingBreakdownComponent } from '@fumes/booking-breakdown';
+// Local imports
+import { environment } from '../../config/environment';
+import { BookingService } from '../../services/booking.service';
+import { StripePaymentService } from '../../services/stripe-payment.service';
+import { WINDOW } from '../../tokens/window.token';
 
-
-import { WINDOW } from "../../providers/window";
 @Component({
   standalone: true,
-  imports: [CommonModule,
+  imports: [
+    CommonModule,
     MatTabsModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -48,38 +46,40 @@ import { WINDOW } from "../../providers/window";
     PricingBreakdownComponent,
     FumesMapComponent,
     MatProgressSpinnerModule,
-    VehicleStatsComponent],
-  selector: "app-manage-booking",
-  templateUrl: "./manage-booking.component.html",
-  styleUrl: "./manage-booking.component.scss",
+  ],
+  selector: 'app-manage-booking',
+  templateUrl: './manage-booking.component.html',
+  styleUrl: './manage-booking.component.scss',
 })
 export class ManageBookingComponent extends BaseComponent implements OnInit {
-  @Inject(PLATFORM_ID) private platformId: Object;
-  @Inject(DOCUMENT) private document: Document;
+  @Input() bookingId!: string;
   readonly window = inject(WINDOW);
+
   constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(DOCUMENT) private document: Document,
     private activeRoute: ActivatedRoute,
-    private fns: Functions,
-    private common: CommonService,
+    private bookingService: BookingService,
     private stripePaymentService: StripePaymentService
   ) {
     super();
     this.isBrowser = isPlatformBrowser(this.platformId);
   }
-  isBrowser: boolean;
+  isBrowser: boolean = false;
   // Tabs
   selectedTabIndex = 0;
   env = environment;
-  booking$: Observable<any>;
-  booking_obj: Booking;
-  fleet: Fleet; //shallow version of fleet that conversation component needs
+  booking$!: Observable<Partial<Booking> | any>;
+  booking_obj!: Booking;
+  fleet!: Fleet; //shallow version of fleet that conversation component needs
   // Payment Dialog
-  paymentDialogElement: HTMLDialogElement;
-  @ViewChild("paymentDialog", { read: ElementRef }) paymentDialog: any;
+  paymentDialogElement!: HTMLDialogElement;
+  @ViewChild('paymentDialog', { read: ElementRef }) paymentDialog: any;
   // Message Cmp
   // Verification
   isLoadingVerification = false;
-  @ViewChild(ConversationComponent) conversation: ConversationComponent;
+  @ViewChild(ConversationComponent, { static: false })
+  conversation!: ConversationComponent;
   // Stripe Element
   card: any;
   cardErrors: any;
@@ -88,19 +88,23 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
   // scroll
 
   override ngOnInit(): void {
-    console.log('ngOnInit')
-    this.booking$ = this.activeRoute.paramMap.pipe(
+    console.log('manage booking');
+    this.booking$ = this.activeRoute.queryParamMap.pipe(
       takeUntil(this.destroyed),
-      switchMap((map: any) => {
-        const bookingId = map.params.bookingId;
-        const pw = this.activeRoute.snapshot.queryParams['pw'];
-        if (!bookingId || !pw) {
+      switchMap((queryParams: any) => {
+        const pw = queryParams.get('pw');
+        if (!this.bookingId || !pw) {
           return of(null);
         }
-        return this.authenticate(bookingId, pw);
+        return this.bookingService.authenticateToManageBooking(
+          this.bookingId,
+          pw
+        );
       }),
-      tap(async (booking) => {
-        if (!booking) return;
+      tap(async (response: any) => {
+        if (!response) return;
+        // Extract booking data from the API response
+        const booking = response.data;
         this.fleet = booking.fleet;
         this.booking_obj = booking;
         await this.initModal();
@@ -115,44 +119,56 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
     this.conversation.setConvoContainerHeight();
     this.conversation.scrollToBottom();
   }
-  authenticate(bookingId: string, pw: string) {
-    return httpsCallableData(this.fns, "authenticate_to_manage_booking")({
-      bookingId,
-      password: pw,
-    });
+  @memoizer()
+  get stripePublishableKey(): string {
+    return environment.stripe.publishableKey;
+  }
+
+  @memoizer()
+  get isProduction(): boolean {
+    return environment.production;
+  }
+
+  @memoizer()
+  get apiUrl(): string {
+    return environment.apiUrl;
   }
   createVerificationSession(booking: Booking) {
     this.isLoadingVerification = true;
-    return httpsCallableData(this.fns, "create_verification_session")({
-      booking,
-    }).pipe(takeUntil(this.destroyed)).subscribe({
-      next: (session: any) => {
-        this.isLoadingVerification = false;
-        console.log('verification session created', session)
-        if (this.stripe) {
-          this.stripe.verifyIdentity(session.client_secret);
-        }
-      }, error: (err: any) => {
-        this.isLoadingVerification = false;
-        console.error('Failed to create verification session', err);
-      }
-    })
+    return this.bookingService
+      .createVerificationSession(booking)
+      .pipe(takeUntil(this.destroyed))
+      .subscribe({
+        next: (response: any) => {
+          this.isLoadingVerification = false;
+          console.log('verification session created', response);
+          const session = response.data;
+          if (this.stripe) {
+            this.stripe.verifyIdentity(session.client_secret);
+          }
+        },
+        error: (err: any) => {
+          this.isLoadingVerification = false;
+          console.error('Failed to create verification session', err);
+        },
+      });
   }
 
+  async createPaymentSession(booking: Booking): Promise<any> {
+    return this.bookingService.createVerificationSession(booking);
+  }
 
   @memoizer()
   formatDate(date: any) {
-    const formatted = this.common.convertFirestoreTimestampToDate(date);
-
-    return formatted;
+    return date;
   }
   async loadStripeConditionally() {
     if (this.window) {
       // @ts-ignore
-      const { loadStripe } = await import("@stripe/stripe-js");
-      this.stripe = await loadStripe(environment.stripe);
+      const { loadStripe } = await import('@stripe/stripe-js');
+      this.stripe = await loadStripe(environment.stripe.publishableKey);
     } else {
-      console.error('window is not defined')
+      console.error('window is not defined');
     }
   }
 
@@ -167,21 +183,21 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
       clientSecret: intent.client_secret,
     });
     const options = {
-      payment_method_types: "card",
+      payment_method_types: 'card',
       layout: {
-        type: "tabs",
+        type: 'tabs',
         defaultCollapsed: false,
       },
     };
-    this.card = this.elements.create("payment", options);
-    this.card.mount("#payment-element");
+    this.card = this.elements.create('payment', options);
+    this.card.mount('#payment-element');
     this.card.addEventListener(
-      "change",
+      'change',
       (data: any) => {
         this.cardErrors = data.error && data.error.message;
       },
       (err: any) => {
-        console.error("Failed to Mount Card", err);
+        console.error('Failed to Mount Card', err);
       }
     );
     return this.card;
@@ -207,7 +223,7 @@ export class ManageBookingComponent extends BaseComponent implements OnInit {
             throw error;
           });
       } catch (error) {
-        console.error("submitHandler", error);
+        console.error('submitHandler', error);
       }
     }
   }
