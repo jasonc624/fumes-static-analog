@@ -1,4 +1,5 @@
 import { adminDb } from '../../lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 import { decryptString } from '../utils/crypto.utils';
 import { sanitizeVehicle, sanitizeFleet } from '../utils/sanitization.utils';
 
@@ -11,6 +12,12 @@ export interface BookingData {
 }
 
 export interface FleetData {
+  [key: string]: any;
+}
+
+export interface AgreementData {
+  password?: string;
+  booking?: BookingData;
   [key: string]: any;
 }
 
@@ -61,6 +68,62 @@ export async function verifyAndRetrieveBooking(
     }
   } catch (error) {
     console.error("Error retrieving booking:", error);
+    throw error;
+  }
+}
+
+/**
+ * Verifies the provided password against the agreement's stored password
+ * and retrieves the agreement data with booking information
+ */
+export async function verifyAndRetrieveAgreement(
+  bookingId: string,
+  password: string,
+  requestedAgreementId: string
+): Promise<AgreementData> {
+  try {
+    console.info("Looking for agreement:", requestedAgreementId, "in booking:", bookingId);
+    
+    // Access the 'agreements' subcollection within the booking document
+    const bookingRef = adminDb.collection("bookings").doc(bookingId);
+    const agreementRef = adminDb
+      .collection("bookings")
+      .doc(bookingId)
+      .collection("agreements")
+      .doc(requestedAgreementId);
+
+    // Get the agreement document
+    const agreementDoc = await agreementRef.get();
+
+    if (!agreementDoc.exists) {
+      throw new Error("Agreement not found");
+    }
+
+    const agreementData = agreementDoc.data() as AgreementData;
+    const decryptedPassword = await decryptString(agreementData.password!);
+    
+    // Check if the passwords match
+    if (password === decryptedPassword) {
+      // Update agreement with view tracking
+       await agreementRef.update({
+         customerViewed: true,
+         dateViewed: FieldValue.serverTimestamp()
+       });
+      
+      // Get booking data
+      const bookingDoc = await bookingRef.get();
+      const booking = bookingDoc.data() as BookingData;
+      agreementData.booking = booking;
+      
+      // Remove password from response for security
+      delete agreementData.password;
+      
+      return agreementData;
+    } else {
+      throw new Error("Password does not match");
+    }
+  } catch (error) {
+    console.error("Error retrieving agreement:", error);
     throw error;
   }
 }

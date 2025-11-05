@@ -1,7 +1,9 @@
 import { BreakpointObserver } from "@angular/cdk/layout";
+import { HttpClient } from "@angular/common/http";
 import {
   ChangeDetectorRef,
   Component,
+  Input,
   OnInit,
   QueryList,
   ViewChild,
@@ -37,9 +39,9 @@ import {
 } from "rxjs";
 import { CommonModule } from "@angular/common";
 // import { DirectivesModule } from "@fumes/directives";
-// import { GeneratedAgreementComponent } from "@fumes/generated-agreement";
 import { Images } from "@fumes/constants";
 import { BaseComponent, Booking } from "@fumes/types";
+import { GeneratedAgreementComponent } from "../generated-agreement/generated-agreement.component";
 
 // Temporary Timestamp interface
 interface Timestamp {
@@ -76,16 +78,16 @@ interface Section {
     MatStepperModule,
     MatButtonModule,
     // DirectivesModule,
-    // GeneratedAgreementComponent,
+    GeneratedAgreementComponent,
   ],
   selector: "app-sign-agreement",
   templateUrl: "./sign-agreement.component.html",
   styleUrl: "./sign-agreement.component.scss",
 })
 export class SignAgreementComponent extends BaseComponent implements OnInit {
+  @Input() agreementId!: string;
   _Images = Images;
   authenticated = false;
-  agreementId: string = '';
   bookingId: string = '';
   password = "";
   agreementDocument: any;
@@ -94,8 +96,13 @@ export class SignAgreementComponent extends BaseComponent implements OnInit {
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
 
-  // @ViewChildren(GeneratedAgreementComponent)
-  // agreementComponents: QueryList<GeneratedAgreementComponent>;
+  // Expose isBrowser to template
+  get isClientSide(): boolean {
+    return this.isBrowser;
+  }
+
+  @ViewChildren(GeneratedAgreementComponent)
+  agreementComponents!: QueryList<GeneratedAgreementComponent>;
   @ViewChild("stepper") stepper!: MatStepper;
 
   // form
@@ -109,15 +116,13 @@ export class SignAgreementComponent extends BaseComponent implements OnInit {
   reservation$ = new BehaviorSubject(null);
   constructor(
     private route: ActivatedRoute,
+    private http: HttpClient,
     // private fns: Functions,
     private cdr: ChangeDetectorRef,
     private fb: FormBuilder,
     breakpointObserver: BreakpointObserver
   ) {
     super();
-    this.agreementId = decodeURIComponent(
-      this.route.snapshot.params?.['agreementId'] || ''
-    );
     this.bookingId = decodeURIComponent(
       this.route.snapshot.queryParams?.['booking'] || ''
     );
@@ -137,49 +142,56 @@ export class SignAgreementComponent extends BaseComponent implements OnInit {
 
   authenticate() {
     this.isLoading = true;
-    // Temporarily disabled Firebase function call
-    // return httpsCallableData(this.fns, "authenticate_agreement")({
-    //   bookingId: this.bookingId,
-    //   password: this.password,
-    //   requestedAgreementId: this.agreementId,
-    // })
-    //   .pipe(
-    //     takeUntil(this.destroyed),
-    //     finalize(() => {
-    //       timer(314).subscribe(() => {
-    //         this.isLoading = false;
-    //         this.cdr.detectChanges();
-    //       });
-    //     })
-    //   )
-    //   .subscribe({
-    //     next: (envelope: any) => {
-
-    //       if (envelope?.id) {
-    //         this.authenticated = true;
-    //         const booking = envelope?.booking;
-    //         this.vehicle$.next(booking?.vehicle);
-    //         this.reservation$.next(booking?.reservation);
-    //         this.customer$.next(booking?.customer);
-    //         this.agreementDocument = envelope;
-    //         console.log("agreementDocument", this.agreementDocument);
-    //         envelope.agreements_to_sign.forEach((agreement: any) => {
-    //           this.agreementsArray.push(this.addAgreement(agreement));
-    //         });
-    //       }
-    //     },
-    //     error: (err: any) => {
-    //       console.error("Failed", err);
-    //       this.authenticated = false;
-    //     },
-    //   });
     
-    // Mock authentication for now
-    timer(314).subscribe(() => {
-      this.isLoading = false;
-      this.authenticated = true;
-      this.cdr.detectChanges();
-    });
+    // Call the new API endpoint
+    return this.http.post('/api/v1/authenticate-agreement', {
+      bookingId: this.bookingId,
+      password: this.password,
+      agreementId: this.agreementId,
+    })
+      .pipe(
+        takeUntil(this.destroyed),
+        finalize(() => {
+          timer(314).subscribe(() => {
+            this.isLoading = false;
+            this.cdr.detectChanges();
+          });
+        })
+      )
+      .subscribe({
+        next: (response: any) => {
+          if (response?.success && response?.data?.id) {
+            this.authenticated = true;
+            const envelope = response.data;
+            const booking = envelope?.booking;
+            
+            // Set the BehaviorSubjects for backward compatibility
+            this.vehicle$.next(booking?.vehicle);
+            this.reservation$.next(booking?.reservation);
+            this.customer$.next(booking?.customer);
+            
+            // Ensure the envelope has the proper structure for the GeneratedAgreementComponent
+            this.agreementDocument = {
+              ...envelope,
+              // Make sure the envelope data is properly structured
+              currentEnvelopeData: {
+                customer: booking?.customer,
+                vehicle: booking?.vehicle,
+                reservation: booking?.reservation
+              }
+            };
+            
+            console.log("agreementDocument", this.agreementDocument);
+            envelope.agreements_to_sign?.forEach((agreement: any) => {
+              this.agreementsArray.push(this.addAgreement(agreement));
+            });
+          }
+        },
+        error: (err: any) => {
+          console.error("Authentication failed", err);
+          this.authenticated = false;
+        },
+      });
   }
 
   get agreementsArray(): FormArray {
@@ -199,10 +211,6 @@ export class SignAgreementComponent extends BaseComponent implements OnInit {
       sectionsArray.push(this.createSection(section));
     });
     return agreementFormGroup;
-  }
-
-  returnFormGroup(group: any): FormGroup {
-    return group as FormGroup;
   }
   createSection(section: Section): FormGroup {
     const sectionGroup = this.fb.group({});
@@ -349,33 +357,37 @@ export class SignAgreementComponent extends BaseComponent implements OnInit {
 
   submitEnvelope() {
     this.isLoading = true;
-    // const rendered_agreements: any[] = [];
-    // this.agreementComponents.forEach((cmp, idx) => {
-    //   const agreement = cmp.tamperProof;
-    //   rendered_agreements.push(this.generateCombinedHtml(agreement, idx));
-    // });
+    
+    // Only process agreement components if we're in the browser
+    if (this.isBrowser && this.agreementComponents) {
+      // const rendered_agreements: any[] = [];
+      // this.agreementComponents.forEach((cmp, idx) => {
+      //   const agreement = cmp.tamperProof;
+      //   rendered_agreements.push(this.generateCombinedHtml(agreement, idx));
+      // });
 
-    // this.agreementDocument.signed_agreements = rendered_agreements;
+      // this.agreementDocument.signed_agreements = rendered_agreements;
 
-    // return httpsCallableData(this.fns, "handle_envelope_submission")(this.agreementDocument)
-    //   .pipe(
-    //     takeUntil(this.destroyed),
-    //     finalize(() => {
-    //       timer(314).subscribe(() => {
-    //         this.isLoading = false;
-    //         this.cdr.detectChanges();
-    //       });
-    //     })
-    //   )
-    //   .subscribe({
-    //     next: () => {
-    //       this.agreementDocument.isSigned = true;
-    //     },
-    //     error: (err: any) => {
-    //       this.agreementDocument.isSigned = false;
-    //       console.log("failed to submit", err);
-    //     },
-    //   });
+      // return httpsCallableData(this.fns, "handle_envelope_submission")(this.agreementDocument)
+      //   .pipe(
+      //     takeUntil(this.destroyed),
+      //     finalize(() => {
+      //       timer(314).subscribe(() => {
+      //         this.isLoading = false;
+      //         this.cdr.detectChanges();
+      //       });
+      //     })
+      //   )
+      //   .subscribe({
+      //     next: () => {
+      //       this.agreementDocument.isSigned = true;
+      //     },
+      //     error: (err: any) => {
+      //       this.agreementDocument.isSigned = false;
+      //       console.log("failed to submit", err);
+      //     },
+      //   });
+    }
     
     // Mock submission for now
     timer(314).subscribe(() => {

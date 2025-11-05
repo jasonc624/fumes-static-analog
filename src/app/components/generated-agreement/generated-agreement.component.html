@@ -1,0 +1,153 @@
+<!-- Envelope Mode: Multiple Agreements -->
+@if(envelope && envelope.agreements?.length) {
+  <div class="envelope-container">
+    <div class="envelope-header">
+      <h2>{{ envelope.name || 'Document Envelope' }}</h2>
+    </div>
+    
+    <!-- Agreement Navigation for multiple agreements -->
+    @if(envelope.agreements.length > 1) {
+      <div class="agreement-tabs">
+        @for(agreement of envelope.agreements; track agreement.id; let i = $index) {
+          <button 
+            type="button"
+            class="tab-button"
+            [class.active]="i === envelopeIdx"
+            (click)="envelopeIdx = i; initializeAgreementData()">
+            {{ agreement.name || 'Agreement ' + (i + 1) }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+}
+
+<!-- Agreement Content Display -->
+@if(currentAgreement || _template) {
+  <!-- 1st Mode: Placeholder View -->
+  @if(!preview && !isSigning) {
+    <div class="printable" id="agreement">
+      @if((currentAgreement?.text || _template?.text)?.length) {
+        <!-- Section Group Start -->
+        <div class="full section-group" *ngFor="let section of (currentAgreement?.text || _template?.text); let i = index">
+          <div>
+            <h3 style="text-align: center">{{ section?.sectionTitle }}</h3>
+            <div class="ql-container ql-snow" style="border-width: 0">
+              <div #sectionBody style="width: 100%" class="ql-editor" [innerHTML]="byPassHTML(section?.sectionBody)"></div>
+            </div>
+            <br />
+            <label for="">Signatures Required</label>
+            <div class="layout-cols">
+              <ng-container *ngIf="section?.initials">
+                <input maxlength="5" data-label="Initials" fumesInput type="text" name="firstInitial" class="quarter" />
+              </ng-container>
+              <ng-container *ngIf="section?.date">
+                <input class="quarter" data-label="Todays Date" fumesInput type="date" name="date" />
+              </ng-container>
+              <ng-container *ngIf="section?.fullName">
+                <input class="half" fumesInput data-label="Full Name" type="text" name="fullName" />
+              </ng-container>
+              <ng-container *ngIf="section?.digitalSignature">
+                <div>
+                  <label for="esign">E Signature</label>
+                  <digital-signature-wrapper name="esign" [minWidth]="0.1"></digital-signature-wrapper>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <!-- Section Group End -->
+      }
+      <hr />
+      <label for="">Confirm</label>
+      <div class="checkbox-group-inline">
+        <input type="checkbox" fumesCheckbox [label]="'acknowledge'" />
+        <label style="width: 100%" for="">I hereby confirm my intention to electronically sign this document and acknowledge that my electronic signature carries the same legal weight as a physical signature</label>
+      </div>
+    </div>
+  }
+
+  <!-- 2nd Mode: Signing with Form Validation -->
+  @if(isSigning && parentForm && !!(currentAgreement || _rendered_template)) {
+    <form [formGroup]="parentForm" class="printable" id="agreement">
+      @if((currentAgreement?.text || _rendered_template?.text)?.length) {
+        <div formArrayName="text">
+          @for(section of textFormArray?.controls || []; track $index) {
+            <div class="full section-group" [formGroupName]="$index">
+              <h3 style="text-align: center">{{ (currentAgreement?.text || _rendered_template?.text)[$index]?.sectionTitle }}</h3>
+              <div class="ql-container ql-snow" style="border-width: 0">
+                <div #sectionBody style="width: 100%" class="ql-editor" [innerHTML]="byPassHTML((currentAgreement?.text || _rendered_template?.text)[$index]?.sectionBody)"></div>
+              </div>
+              <br />
+              <label>Signatures Required</label>
+              <div class="layout-cols">
+                @if(!!section.get('initials')) {
+                  <input [id]="'initials-' + envelopeIdx + '-' + $index" maxlength="5" data-label="Initials" fumesInput formControlName="initials" type="text" name="firstInitial" class="quarter signable" />
+                }
+                @if(!!section.get('date')) {
+                  <input [id]="'todaysdate-' + envelopeIdx + '-' + $index" class="quarter signable" data-label="Todays Date" formControlName="date" fumesInput type="date" name="date" />
+                }
+                @if(!!section.get('fullName')) {
+                  <input [id]="'fullname-' + envelopeIdx + '-' + $index" class="half signable" formControlName="fullName" fumesInput data-label="Full Name" type="text" name="fullName" />
+                }
+                @if(!!section.get('digitalSignature')) {
+                  <div class="signable">
+                    <label for="esign">E Signature</label>
+                    <digital-signature-wrapper formControlName="digitalSignature" [id]="'digitalSignature-' + envelopeIdx + '-' + $index" [dot]="0.1" [minWidth]="0.1"></digital-signature-wrapper>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+      <hr />
+      <label for="">Confirm</label>
+      <div class="flex-checkbox-group">
+        <input type="checkbox" formControlName="acknowledge" fumesCheckbox [label]="'acknowledge'" />
+        <label style="width: 100%" for="">I hereby confirm my intention to electronically sign this document and acknowledge that my electronic signature carries the same legal weight as a physical signature</label>
+      </div>
+    </form>
+  }
+
+  <!-- 3rd Mode: Preview with Actual Values -->
+  @if(preview && !parentForm) {
+    <form class="printable" id="agreement">
+      @if((currentAgreement?.text || _rendered_template?.text)?.length) {
+        @for(section of (currentAgreement?.text || _rendered_template?.text); track $index) {
+          <div class="full section-group">
+            <h3 style="text-align: center">{{ section?.sectionTitle }}</h3>
+            <div class="ql-container ql-snow" style="border-width: 0">
+              <div #sectionBody style="width: 100%" class="ql-editor" [innerHTML]="byPassHTML(section?.sectionBody)"></div>
+            </div>
+            <br />
+            <label>Signatures Required</label>
+            <div class="layout-cols">
+              @if(section?.initials) {
+                <input [id]="'initials-' + $index" maxlength="5" data-label="Initials" fumesInput type="text" name="firstInitial" class="quarter" />
+              }
+              @if(section?.date) {
+                <input [id]="'todaysdate-' + $index" class="quarter" data-label="Todays Date" fumesInput type="date" name="date" />
+              }
+              @if(section?.fullName) {
+                <input [id]="'fullname-' + $index" class="half" fumesInput data-label="Full Name" type="text" name="fullName" />
+              }
+              @if(section?.digitalSignature) {
+                <div>
+                  <label for="esign">E Signature</label>
+                  <digital-signature-wrapper [id]="'digitalSignature-' + $index" name="esign" [dot]="0.1" [minWidth]="0.1"></digital-signature-wrapper>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+      <hr />
+      <label for="">Confirm</label>
+      <div class="flex-checkbox-group">
+        <input type="checkbox" fumesCheckbox [label]="'acknowledge'" />
+        <label style="width: 100%" for="">I hereby confirm my intention to electronically sign this document and acknowledge that my electronic signature carries the same legal weight as a physical signature</label>
+      </div>
+    </form>
+  }
+}
