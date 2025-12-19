@@ -1,3 +1,4 @@
+@use "tailwindcss";
 @use '@angular/material' as mat;
 @use './variables.scss' as *;
 
@@ -13,7 +14,6 @@
 //     accent: $my-accent,
 //   )
 // ));
-
 // My Styles
 $my-primary: mat.m2-define-palette(mat.$m2-pink-palette, 600);
 $my-accent: mat.m2-define-palette(mat.$m2-cyan-palette, 600);

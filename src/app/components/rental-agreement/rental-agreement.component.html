@@ -1,0 +1,231 @@
+<div class="rental-agreement-container max-w-4xl mx-auto p-4 md:p-8">
+  <!-- Agreement Header -->
+  @if (agreementData) {
+    <div class="mb-8 border-b border-gray-300 pb-6">
+      <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+        {{ agreementData!.name }}
+      </h1>
+      @if (isPreviewMode()) {
+        <div class="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
+          <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+            <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+          </svg>
+          Preview Mode
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Agreement Sections -->
+  @if (agreementData) {
+    <form [formGroup]="sectionsForm" (ngSubmit)="onSubmit()" class="space-y-12">
+    @if (sectionsArray?.length) {
+      <div formArrayName="sections">
+      @for (section of processedSections(); track section.id; let i = $index) {
+        <div class="agreement-section bg-white rounded-lg shadow-sm border border-gray-200 p-2 md:p-8">
+          <!-- Section Title -->
+          @if (section.sectionTitle) {
+            <h2 class="text-2xl font-semibold text-gray-900 mb-4 border-b border-gray-200 pb-3">
+              {{ section.sectionTitle }}
+            </h2>
+          }
+
+          <!-- Section Body (HTML Content) -->
+          <div
+            class="section-body prose prose-sm md:prose-base max-w-none mb-6 text-gray-700 leading-relaxed"
+            [innerHTML]="section.processedBody">
+          </div>
+        </div>
+
+        <!-- Signature Fields (only in signing mode) -->
+        @if (!isPreviewMode()) {
+          <div [formGroupName]="i" class="signature-fields bg-blue-100 rounded-lg shadow-sm border border-gray-200 p-6 md:p-8 mt-4 mb-8">
+            <h3 class="text-xl font-bold text-gray-900 mb-8 flex items-center">
+              <svg class="w-5 h-5 mr-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M13.586 3.586a 2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+              </svg>
+              Required Signatures
+            </h3>
+
+            <div class="space-y-8">
+              <!-- Digital Signature (Full Width) -->
+              @if (isSectionFieldRequired(i, 'signature')) {
+                <div class="w-full">
+                  <label
+                    [for]="getControlId(i, 'signature')"
+                    class="block text-sm font-semibold text-gray-800 mb-3">
+                    Digital Signature <span class="text-red-600">*</span>
+                  </label>
+                  <div class="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 min-h-[200px]">
+                    <signature-pad
+                       #signaturePad
+                       [id]="getControlId(i, 'signature')"
+                       [options]="{dotSize: 2, minWidth: 2, maxWidth: 4, backgroundColor: 'white', canvasHeight:154, canvasWidth:614}"
+                       (drawEnd)="onSignatureChange(signaturePad, i)"
+                     ></signature-pad>
+                  </div>
+                  <div class="flex gap-3 mt-4">
+                    <button
+                      type="button"
+                      (click)="clearSignature(i)"
+                      [disabled]="isSignatureEmpty(i)"
+                      class="flex-1 px-4 py-2 border-2 border-red-500 text-red-600 font-semibold rounded-lg hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-white transition-colors">
+                      Clear
+                    </button>
+                    <button
+                      type="button"
+                      (click)="saveSignature(i)"
+                      [disabled]="isSignatureEmpty(i)"
+                      class="flex-1 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-colors">
+                      Save Signature
+                    </button>
+                  </div>
+                  @if (getSectionFormGroup(i).get('signature')?.invalid && getSectionFormGroup(i).get('signature')?.touched) {
+                    <p class="mt-3 text-sm text-red-600 font-medium">
+                      Digital signature is required
+                    </p>
+                  }
+                </div>
+              }
+
+              <!-- Full Name and Initials Row -->
+              @if ((isSectionFieldRequired(i, 'fullName') && getSectionFormGroup(i).get('fullName')) || (isSectionFieldRequired(i, 'initials') && getSectionFormGroup(i).get('initials'))) {
+                <div class="flex gap-4 mt-8">
+                  <!-- Full Name (75% width) -->
+                  @if (isSectionFieldRequired(i, 'fullName') && getSectionFormGroup(i).get('fullName')) {
+                    <div class="flex-[3]">
+                      <label
+                        [for]="getControlId(i, 'fullName')"
+                        class="block text-sm font-semibold text-gray-800 mb-2">
+                        Full Name <span class="text-red-600">*</span>
+                      </label>
+                      <input
+                        [id]="getControlId(i, 'fullName')"
+                        formControlName="fullName"
+                        type="text"
+                        placeholder="Your full legal name"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        [class.border-red-500]="getSectionFormGroup(i).get('fullName')?.invalid && getSectionFormGroup(i).get('fullName')?.touched">
+                      @if (getSectionFormGroup(i).get('fullName')?.invalid &&
+                            getSectionFormGroup(i).get('fullName')?.touched) {
+                        <p class="mt-1 text-sm text-red-600 font-medium">Full name must be at least 2 characters</p>
+                      }
+                    </div>
+                  }
+
+                  <!-- Initials (25% width) -->
+                  @if (isSectionFieldRequired(i, 'initials') && getSectionFormGroup(i).get('initials')) {
+                    <div class="flex-1">
+                      <label
+                        [for]="getControlId(i, 'initials')"
+                        class="block text-sm font-semibold text-gray-800 mb-2">
+                        Initials <span class="text-red-600">*</span>
+                      </label>
+                      <input
+                        [id]="getControlId(i, 'initials')"
+                        formControlName="initials"
+                        type="text"
+                        placeholder="Your initials"
+                        maxlength="4"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        [class.border-red-500]="getSectionFormGroup(i).get('initials')?.invalid && getSectionFormGroup(i).get('initials')?.touched">
+                      @if (getSectionFormGroup(i).get('initials')?.invalid &&
+                            getSectionFormGroup(i).get('initials')?.touched) {
+                        <p class="mt-1 text-sm text-red-600 font-medium">Initials must be at least 2 characters</p>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Date (75% width on its own line) -->
+              @if (isSectionFieldRequired(i, 'date') && getSectionFormGroup(i).get('date')) {
+                <div class="mt-8 max-w-3xl">
+                  <div class="flex gap-3">
+                    <div class="flex-[3]">
+                      <label
+                        [for]="getControlId(i, 'date')"
+                        class="block text-sm font-semibold text-gray-800 mb-2">
+                        Date <span class="text-red-600">*</span>
+                      </label>
+                      <input
+                        [id]="getControlId(i, 'date')"
+                        type="date"
+                        formControlName="date"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                        [class.border-red-500]="getSectionFormGroup(i).get('date')?.invalid && getSectionFormGroup(i).get('date')?.touched">
+                      @if (getSectionFormGroup(i).get('date')?.invalid &&
+                            getSectionFormGroup(i).get('date')?.touched) {
+                        <p class="mt-1 text-sm text-red-600 font-medium">Date is required</p>
+                      }
+                    </div>
+                    <button
+                      type="button"
+                      (click)="setTodayDate(i)"
+                      class="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors text-sm self-end mb-0">
+                      Today
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+      }
+      </div>
+    }
+
+    <!-- Submit Button (only in signing mode) -->
+    @if (!isPreviewMode()) {
+      <div class="sticky bottom-0 left-0 right-0 bg-white border-t-2 border-gray-300 p-4 md:p-6 shadow-lg">
+        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="text-sm text-gray-600">
+            @if (!isFormValid()) {
+              <div class="flex items-center text-orange-600">
+                <mat-icon class="mr-2">warning</mat-icon>
+                Please complete all required fields
+              </div>
+            } @else {
+              <div class="flex items-center text-green-600">
+                <mat-icon class="mr-2">check_circle</mat-icon>
+                All fields completed
+              </div>
+            }
+          </div>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="!isFormValid() || isSubmitting()"
+            class="w-full sm:w-auto px-8 py-3 text-lg font-semibold">
+            @if (isSubmitting()) {
+              <mat-icon class="mr-2">hourglass_empty</mat-icon>
+              Submitting...
+            } @else if (isFormValid()) {
+              <mat-icon class="mr-2">check_circle</mat-icon>
+              Sign and Complete Agreement
+            } @else {
+              <mat-icon class="mr-2">check_circle</mat-icon>
+              Sign and Complete Agreement
+            }
+          </button>
+        </div>
+      </div>
+    }
+    </form>
+  }
+
+  <!-- Print Styles -->
+  <style>
+    @media print {
+      .sticky {
+        position: static !important;
+      }
+      button {
+        display: none !important;
+      }
+    }
+  </style>
+</div>

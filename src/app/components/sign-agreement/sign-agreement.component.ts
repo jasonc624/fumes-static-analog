@@ -1,88 +1,65 @@
-import { BreakpointObserver } from "@angular/cdk/layout";
 import { HttpClient } from "@angular/common/http";
 import {
   ChangeDetectorRef,
   Component,
   Input,
   OnInit,
-  QueryList,
-  ViewChild,
-  ViewChildren,
   inject,
   PLATFORM_ID,
 } from "@angular/core";
-// import { Timestamp } from "@angular/fire/firestore";
-// import { Functions, httpsCallableData } from "@angular/fire/functions";
 import {
-  FormArray,
-  FormBuilder,
-  FormControl,
-  FormGroup,
   FormsModule,
-  ReactiveFormsModule,
-  Validators,
 } from "@angular/forms";
 import { MatButtonModule } from "@angular/material/button";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
-import { MatStepper, StepperOrientation, MatStepperModule } from "@angular/material/stepper";
+import { MatStepperModule } from "@angular/material/stepper";
+import { MatIconModule } from "@angular/material/icon";
+import { MatDialog } from "@angular/material/dialog";
 import { ActivatedRoute } from "@angular/router";
 import { isPlatformBrowser } from "@angular/common";
 
 
 import {
-  BehaviorSubject,
-  Observable,
   finalize,
-  map,
   takeUntil,
   timer,
 } from "rxjs";
 import { CommonModule } from "@angular/common";
-// import { DirectivesModule } from "@fumes/directives";
 import { Images } from "@fumes/constants";
 import { BaseComponent, Booking } from "@fumes/types";
-import { GeneratedAgreementComponent } from "../generated-agreement/generated-agreement.component";
+import { RentalAgreementComponent } from "../rental-agreement/rental-agreement.component";
+import { EnvelopeSubmissionDialogComponent } from "../envelope-submission-dialog/envelope-submission-dialog.component";
+import { Envelope, Agreement, AuditEvent } from "../../models/envelope.model";
 
-// Temporary Timestamp interface
-interface Timestamp {
-  seconds: number;
-  nanoseconds: number;
-}
-
-interface Agreement {
-  fleetRef: string;
-  wet_sign: boolean;
-  appliedTo: any[];
-  created: Timestamp;
-  name: string;
+interface AgreementData {
   id: string;
-  text: Section[];
-  type: string;
-  updated: Timestamp;
-}
-interface Section {
-  date: boolean;
-  sectionTitle: string;
-  digitalSignature: boolean;
-  initials: boolean;
-  fullName: boolean;
-  sectionBody: string;
+  name: string;
+  sections: {
+    id?: string;
+    sectionTitle: string;
+    sectionBody: string;
+    requiredSignatures: ('signature' | 'initials' | 'fullName' | 'date')[];
+  }[];
+  actualValues?: {
+    customer?: Record<string, any>;
+    vehicle?: Record<string, any>;
+    reservation?: Record<string, any>;
+  };
 }
 @Component({
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    ReactiveFormsModule,
     MatProgressSpinnerModule,
-    MatStepperModule,
     MatButtonModule,
-    // DirectivesModule,
-    GeneratedAgreementComponent,
+    MatStepperModule,
+    MatIconModule,
+    RentalAgreementComponent,
   ],
   selector: "app-sign-agreement",
   templateUrl: "./sign-agreement.component.html",
-  styleUrl: "./sign-agreement.component.scss",
+  styleUrls: ["./sign-agreement.component.scss"],
 })
 export class SignAgreementComponent extends BaseComponent implements OnInit {
   @Input() agreementId!: string;
@@ -90,60 +67,70 @@ export class SignAgreementComponent extends BaseComponent implements OnInit {
   authenticated = false;
   bookingId: string = '';
   password = "";
-  agreementDocument: any;
+  agreementDocument: Envelope | null = null;
+  // Multiple agreements to sign
+  currentAgreementData: AgreementData | null = null;
+  agreementsToSign: AgreementData[] = [];
+  // Track which agreements have been signed locally to drive UI
+  private signedAgreementIds = new Set<string>();
   isLoading = false;
   booking: Booking = {} as Booking;
   private platformId = inject(PLATFORM_ID);
   private isBrowser = isPlatformBrowser(this.platformId);
+
+  // Store signed agreement data for complete envelope submission
+  private signedAgreementsData!: Map<string, any>;
+
+  // E-sign compliance: Audit trail
+  private auditTrail: AuditEvent[] = [];
 
   // Expose isBrowser to template
   get isClientSide(): boolean {
     return this.isBrowser;
   }
 
-  @ViewChildren(GeneratedAgreementComponent)
-  agreementComponents!: QueryList<GeneratedAgreementComponent>;
-  @ViewChild("stepper") stepper!: MatStepper;
+  // Expose signing progress to template
+  get signedCount(): number {
+    return this.signedAgreementIds.size;
+  }
 
-  // form
-  agreementsForm: FormGroup = new FormGroup({});
-  documentsForm: FormGroup = new FormGroup({});
+  get allSigned(): boolean {
+    return this.agreementsToSign.length > 0 && this.signedAgreementIds.size >= this.agreementsToSign.length;
+  }
 
-  stepperOrientation: Observable<StepperOrientation>;
-  // These are used to render the html in the generated agreement
-  vehicle$ = new BehaviorSubject(null);
-  customer$ = new BehaviorSubject(null);
-  reservation$ = new BehaviorSubject(null);
+  // Public helper for template to check if an agreement is signed
+  isSigned(agreementId: string): boolean {
+    return this.signedAgreementIds.has(agreementId);
+  }
+
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    // private fns: Functions,
     private cdr: ChangeDetectorRef,
-    private fb: FormBuilder,
-    breakpointObserver: BreakpointObserver
+    private dialog: MatDialog,
   ) {
     super();
     this.bookingId = decodeURIComponent(
       this.route.snapshot.queryParams?.['booking'] || ''
     );
-    this.stepperOrientation = breakpointObserver
-      .observe("(min-width: 1100px)")
-      .pipe(map(({ matches }) => (matches ? "horizontal" : "vertical")));
   }
 
   override ngOnInit(): void {
-    this.documentsForm = this.fb.group({
-      documents: this.fb.array([]),
-    });
-    this.agreementsForm = this.fb.group({
-      agreements: this.fb.array([]),
-    });
+    // Add "viewed" audit event when component initializes
+    this.addAuditEvent('viewed', { agreementId: this.agreementId });
+
   }
 
   authenticate() {
     this.isLoading = true;
-    
-    // Call the new API endpoint
+
+    // Add authentication audit event
+    this.addAuditEvent('authenticated', {
+      bookingId: this.bookingId,
+      agreementId: this.agreementId
+    });
+
+    // Call the authentication API endpoint
     return this.http.post('/api/v1/authenticate-agreement', {
       bookingId: this.bookingId,
       password: this.password,
@@ -162,240 +149,201 @@ export class SignAgreementComponent extends BaseComponent implements OnInit {
         next: (response: any) => {
           if (response?.success && response?.data?.id) {
             this.authenticated = true;
-            const envelope = response.data;
-            const booking = envelope?.booking;
-            
-            // Set the BehaviorSubjects for backward compatibility
-            this.vehicle$.next(booking?.vehicle);
-            this.reservation$.next(booking?.reservation);
-            this.customer$.next(booking?.customer);
-            
-            // Ensure the envelope has the proper structure for the GeneratedAgreementComponent
-            this.agreementDocument = {
-              ...envelope,
-              // Make sure the envelope data is properly structured
-              currentEnvelopeData: {
-                customer: booking?.customer,
-                vehicle: booking?.vehicle,
-                reservation: booking?.reservation
-              }
-            };
-            
-            console.log("agreementDocument", this.agreementDocument);
-            envelope.agreements_to_sign?.forEach((agreement: any) => {
-              this.agreementsArray.push(this.addAgreement(agreement));
+            const envelope: Envelope = response.data;
+
+            // Store the envelope
+            this.agreementDocument = envelope;
+
+            console.log("Authenticated envelope:", this.agreementDocument);
+
+            // Map envelope data to our simplified AgreementData structure
+            const agreements = envelope.agreements_to_sign || envelope.agreements || [];
+            this.agreementsToSign = agreements.map((ag) => this.mapAgreementToData(ag, envelope));
+            this.currentAgreementData = this.agreementsToSign[0] || null;
+
+            // Add "started" audit event
+            this.addAuditEvent('started', {
+              agreementId: this.currentAgreementData?.id,
+              totalAgreements: this.agreementsToSign.length
             });
+
+            // Trigger change detection
+            this.cdr.detectChanges();
           }
         },
         error: (err: any) => {
           console.error("Authentication failed", err);
           this.authenticated = false;
+          this.cdr.detectChanges();
         },
       });
   }
 
-  get agreementsArray(): FormArray {
-    return this.agreementsForm.get("agreements") as FormArray;
+  /**
+   * Map Agreement from envelope to simplified AgreementData structure
+   */
+  private mapAgreementToData(agreement: Agreement, envelope: Envelope): AgreementData {
+    return {
+      id: agreement.id,
+      name: agreement.name,
+      sections: agreement.text.map((section, index) => {
+        const requiredSignatures: ('signature' | 'initials' | 'fullName' | 'date')[] = [];
+
+        if (section.digitalSignature) requiredSignatures.push('signature');
+        if (section.initials) requiredSignatures.push('initials');
+        if (section.fullName) requiredSignatures.push('fullName');
+        if (section.date) requiredSignatures.push('date');
+
+        return {
+          id: section.id || `section-${index}`,
+          sectionTitle: section.sectionTitle,
+          sectionBody: section.sectionBody,
+          requiredSignatures,
+        };
+      }),
+      actualValues: {
+        // Customer, vehicle, and reservation are at the root level of the envelope
+        customer: envelope?.customer,
+        vehicle: envelope?.vehicle,
+        reservation: envelope?.reservation,
+      },
+    };
   }
 
-  addAgreement(agreement: Agreement): FormGroup {
-    const agreementFormGroup: FormGroup = this.fb.group({
-      id: [agreement.id],
-      name: [agreement.name],
-      text: this.fb.array([]),
-      acknowledge: new FormControl(false, [Validators.requiredTrue]),
+  /**
+   * Handle agreement signed event from RentalAgreementComponent
+   */
+  onAgreementSigned(signedData: any): void {
+    console.log('Agreement signed:', signedData);
+
+    // Track locally that this agreement was signed IMMEDIATELY
+    // This enables stepper navigation without waiting for backend
+    this.signedAgreementIds.add(signedData.agreementId);
+    
+    // Add completed audit event
+    this.addAuditEvent('completed', {
+      agreementId: signedData.agreementId,
+      sectionsCount: signedData.sections.length
     });
 
-    const sectionsArray = agreementFormGroup.get("text") as FormArray;
-    agreement.text.forEach((section) => {
-      sectionsArray.push(this.createSection(section));
-    });
-    return agreementFormGroup;
-  }
-  createSection(section: Section): FormGroup {
-    const sectionGroup = this.fb.group({});
-
-    if (section?.initials) {
-      sectionGroup.addControl(
-        "initials",
-        this.fb.control("", [Validators.required, Validators.minLength(2)])
-      );
+    // Store the signed data for later submission when envelope is complete
+    if (!this.signedAgreementsData) {
+      this.signedAgreementsData = new Map();
     }
-    if (section?.date) {
-      sectionGroup.addControl("date", this.fb.control("", Validators.required));
-    }
-    if (section?.fullName) {
-      sectionGroup.addControl(
-        "fullName",
-        this.fb.control("", Validators.required)
-      );
-    }
-    if (section?.digitalSignature) {
-      sectionGroup.addControl(
-        "digitalSignature",
-        this.fb.control(null, Validators.required)
-      );
-    }
-    return sectionGroup;
-  }
+    this.signedAgreementsData.set(signedData.agreementId, signedData);
 
-  createAgreementFormGroup(doc: any): FormGroup {
-    return this.fb.group({
-      bookingRef: [doc.bookingRef],
-      created: [doc.created],
-      customerViewed: [doc.customerViewed],
-      dateViewed: [doc.dateViewed],
-      id: [doc.id],
-      isSigned: [doc.isSigned],
-      ttl: [doc.ttl],
-    });
-  }
-
-  get documents(): FormArray {
-    return this.documentsForm.get("documents") as FormArray;
-  }
-  textArray(index: number): FormArray {
-    return this.agreementsArray.at(index).get("text") as FormArray;
-  }
-
-  scrollToFirstInvalidControl(): void {
-    const controlNames = ["digitalSignature", "initials", "date", "fullName"];
-    let allValid = true; // Flag to track if all required controls are valid in the current step
-
-    // Loop over all the agreements
-    for (let i = 0; i < this.agreementsArray.length; i++) {
-      // Set the stepper to the current agreement step
-      this.stepper.selectedIndex = i;
-
-      // Get the text group for this one
-      const textGroups = this.textArray(i);
-      // Loop over all the text groups to see what signatures they require
-      for (let j = 0; j < textGroups.length; j++) {
-        // Loop over all available controls
-        for (let controlName of controlNames) {
-          // Does this text group need this control name?
-          const control = textGroups.at(j).get(controlName);
-          if (control && !control.valid) {
-            allValid = false; // Set allValid to false if any control is invalid
-            // Check if it does and if its not valid so we can scroll to it
-            const elementId = `${controlName}-${i}-${j}`;
-
-            if (this.isBrowser) {
-              const element = document.getElementById(elementId);
-              if (element) {
-                element.scrollIntoView({ behavior: "smooth", block: "center" });
-                return; // Stop after the first invalid control
-              }
-            }
-          }
-        }
-      }
-
-      // If all controls in this step are valid, move to the next step
-      if (allValid) {
-        if (i < this.agreementsArray.length - 1) {
-          this.stepper.next();
-        }
-      } else {
-        break; // Break the loop if we find an invalid control
-      }
+    // Check if all agreements are signed, then submit the entire envelope
+    if (this.allSigned) {
+      this.submitCompleteEnvelope();
     }
 
-    // Optionally, handle the case where all steps are complete
-    if (
-      allValid &&
-      this.stepper.selectedIndex === this.agreementsArray.length - 1
-    ) {
-      console.log("All agreements are signed and valid.");
-      // You might want to navigate to a confirmation page or show a completion message
-    }
+    // Trigger change detection to update UI state
+    this.cdr.detectChanges();
   }
 
-  getCurrentStep() {
-    if (this.stepper) {
-      console.log("Current step index:", this.stepper.selectedIndex);
-      return this.stepper.selectedIndex; // Returns the current step index (0-based)
-    }
-    return 0;
-  }
-  escapeHtml(str: string) {
-    return str
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
-  // Submit
-  generateCombinedHtml(agreement: any, idx: number) {
-    let combinedHtml = "<html>";
-    combinedHtml +=
-      "<style> * {font-family:sans-serif;} body {max-width: 8.5in;}</style>";
-    combinedHtml += "<body style='padding:24px 12px;'>";
-    if (agreement?.text) {
-      agreement.text.forEach((section: any, textIdx: number) => {
-        const agreement_signatures: any[] =
-          this.agreementsForm.getRawValue().agreements;
-        const single_agreement = agreement_signatures[idx];
-        const currentSection = single_agreement?.text?.[textIdx];
-
-        combinedHtml += `<h2>${this.escapeHtml(section.sectionTitle)}</h2>`;
-        combinedHtml += `<p>${section.sectionBody}</p>`;
-        // Check what type of signature and append appropriately
-        if (currentSection?.digitalSignature) {
-          combinedHtml += `<img src="${currentSection?.digitalSignature.signature}" alt="Digital Signature" />`;
-        } else if (currentSection?.initials) {
-          combinedHtml += `<div>Initials: ${currentSection.initials}<br>Full Name: ${currentSection.fullName}</div>`;
-        } else if (currentSection?.date) {
-          combinedHtml += `<div>Date: ${currentSection.date}</div>`;
-        }
-      });
-    }
-    combinedHtml += "</body></html>";
-    return combinedHtml;
-  }
-
-  submitEnvelope() {
+  /**
+   * Submit the complete envelope when all agreements are signed
+   */
+  private submitCompleteEnvelope(): void {
     this.isLoading = true;
-    
-    // Only process agreement components if we're in the browser
-    if (this.isBrowser && this.agreementComponents) {
-      // const rendered_agreements: any[] = [];
-      // this.agreementComponents.forEach((cmp, idx) => {
-      //   const agreement = cmp.tamperProof;
-      //   rendered_agreements.push(this.generateCombinedHtml(agreement, idx));
-      // });
 
-      // this.agreementDocument.signed_agreements = rendered_agreements;
+    // Collect all signed agreement data
+    const allSignedData = Array.from(this.signedAgreementsData.values());
 
-      // return httpsCallableData(this.fns, "handle_envelope_submission")(this.agreementDocument)
-      //   .pipe(
-      //     takeUntil(this.destroyed),
-      //     finalize(() => {
-      //       timer(314).subscribe(() => {
-      //         this.isLoading = false;
-      //         this.cdr.detectChanges();
-      //       });
-      //     })
-      //   )
-      //   .subscribe({
-      //     next: () => {
-      //       this.agreementDocument.isSigned = true;
-      //     },
-      //     error: (err: any) => {
-      //       this.agreementDocument.isSigned = false;
-      //       console.log("failed to submit", err);
-      //     },
-      //   });
-    }
-    
-    // Mock submission for now
-    timer(314).subscribe(() => {
-      this.isLoading = false;
-      if (this.agreementDocument) {
-        this.agreementDocument.isSigned = true;
-      }
-      this.cdr.detectChanges();
-    });
+    // Submit complete envelope to backend
+    this.http.post('/api/v1/submit-envelope', {
+      envelopeId: this.agreementDocument?.id,
+      bookingRef: this.agreementDocument?.bookingRef || this.bookingId,
+      signedData: allSignedData.length === 1 ? allSignedData[0] : allSignedData,
+      auditTrail: this.auditTrail,
+    })
+      .pipe(
+        takeUntil(this.destroyed),
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: (response: any) => {
+          console.log('Complete envelope submitted successfully:', response);
+
+          // Show success dialog
+          this.dialog.open(EnvelopeSubmissionDialogComponent, {
+            width: '450px',
+            disableClose: true,
+            data: {
+              type: 'success',
+              title: 'Agreement Successfully Signed',
+              message: response.message || 'Your agreement has been successfully submitted and signed.',
+              primaryButtonText: 'Done'
+            }
+          }).afterClosed().subscribe(() => {
+            // Redirect or perform next action after dialog closes
+            console.log('Success dialog closed');
+            // You can add navigation here if needed
+          });
+
+          this.cdr.detectChanges();
+        },
+        error: (err: any) => {
+          console.error('Failed to submit complete envelope:', err);
+
+          // Extract error information from response
+          let errorMessage = 'Failed to submit your signed agreement. Please try again.';
+          let errorCode = 'SUBMISSION_FAILED';
+          let errorDetails: string | undefined;
+
+          // Handle HTTP error response
+          if (err.error && typeof err.error === 'object') {
+            errorMessage = err.error.message || errorMessage;
+            errorCode = err.error.code || errorCode;
+            errorDetails = err.error.details;
+          } else if (err.message) {
+            errorMessage = err.message;
+          }
+
+          // Show error dialog with retry option
+          this.dialog.open(EnvelopeSubmissionDialogComponent, {
+            width: '450px',
+            disableClose: false,
+            data: {
+              type: 'error',
+              title: 'Submission Failed',
+              message: errorMessage,
+              details: errorDetails || `Error code: ${errorCode}`,
+              primaryButtonText: 'Close',
+              secondaryButtonText: 'Try Again'
+            }
+          }).afterClosed().subscribe((result) => {
+            if (result === 'retry') {
+              // Retry submission
+              this.submitCompleteEnvelope();
+            }
+          });
+
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
+  }
+
+  /**
+   * Add audit event with timestamp and metadata
+   */
+  private addAuditEvent(
+    event: 'viewed' | 'started' | 'section_completed' | 'completed' | 'declined' | 'authenticated' | 'sent',
+    metadata?: any
+  ): void {
+    const auditEvent: AuditEvent = {
+      event,
+      timestamp: new Date().toISOString(),
+      actor: this.agreementDocument?.signer_email,
+      userAgent: this.isBrowser ? navigator.userAgent : undefined,
+      metadata,
+    };
+
+    this.auditTrail.push(auditEvent);
+    console.log('Audit event added:', auditEvent);
   }
 }

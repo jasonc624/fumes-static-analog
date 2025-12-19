@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { RouteMeta } from '@analogjs/router';
-import { TestGeneratedAgreementComponent } from '../components/generated-agreement/test-generated-agreement.component';
+// import { TestGeneratedAgreementComponent } from '../components/generated-agreement/test-generated-agreement.component';
 
 // Route metadata for SEO
 export const routeMeta: RouteMeta = {
@@ -16,9 +16,11 @@ export const routeMeta: RouteMeta = {
 @Component({
   selector: 'app-test-generated-agreement-page',
   standalone: true,
-  imports: [TestGeneratedAgreementComponent],
+  imports: [],
   template: `
-    <app-test-generated-agreement></app-test-generated-agreement>
+    <div class="p-8 bg-primary text-white">
+      <h1 class="text-2xl font-primary">Tailwind CSS is working!</h1>
+    </div>
   `,
   styles: [`
     :host {

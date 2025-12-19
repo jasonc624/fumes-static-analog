@@ -1,0 +1,207 @@
+// Rental Agreement Component Styles
+
+.rental-agreement-container {
+
+  // Section body typography
+  .section-body {
+    line-height: 1.8;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+
+    // Style for placeholder tags in signing mode
+    :deep(.placeholder-tag) {
+      display: inline-block;
+      padding: 2px 8px;
+      background-color: #fef3c7; // yellow-100
+      color: #92400e; // yellow-800
+      border-radius: 4px;
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin: 0 2px;
+      word-break: break-word;
+    }
+
+    // Style for mention spans (legacy support if needed)
+    :deep(.mention) {
+      background-color: #dbeafe; // blue-100
+      color: #1e40af; // blue-800
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: 500;
+      display: inline-block;
+      word-break: break-word;
+    }
+
+    // Ensure links wrap properly
+    :deep(a) {
+      word-break: break-word;
+    }
+
+    // Ensure good spacing for paragraphs
+    :deep(p) {
+      margin-bottom: 1rem;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    // Lists styling
+    :deep(ul), :deep(ol) {
+      margin: 1rem 0;
+      padding-left: 2rem;
+
+      li {
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    // Headings within content
+    :deep(h1), :deep(h2), :deep(h3), :deep(h4) {
+      font-weight: 600;
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      color: #111827; // gray-900
+    }
+
+    // Bold and emphasis
+    :deep(strong), :deep(b) {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    // Tables if present
+    :deep(table) {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+
+      th, td {
+        border: 1px solid #d1d5db; // gray-300
+        padding: 0.5rem;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f3f4f6; // gray-100
+        font-weight: 600;
+      }
+    }
+  }
+
+  // Agreement section card styles
+  .agreement-section {
+    // Smooth transitions
+    transition: box-shadow 0.2s ease-in-out;
+
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+  }
+
+  // Signature fields container
+  .signature-fields {
+    // Styling is now handled by Tailwind classes
+    // bg-white rounded-lg shadow-sm border border-gray-200 p-6 md:p-8 mt-4
+  }
+
+  // Print styles
+  @media print {
+    .sticky, button {
+      display: none !important;
+    }
+
+    .agreement-section {
+      page-break-inside: avoid;
+      box-shadow: none;
+      border: 1px solid #000;
+      margin-bottom: 2rem;
+    }
+
+    .section-body {
+      color: #000;
+
+      :deep(.placeholder-tag) {
+        background-color: #fff;
+        border: 1px solid #000;
+      }
+    }
+  }
+
+  // Mobile optimizations
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .agreement-section {
+      padding: 1rem;
+    }
+
+    .signature-fields {
+      padding: 1rem;
+    }
+
+    .section-body {
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+  }
+
+  // Focus styles for accessibility
+  input:focus,
+  button:focus {
+    outline: 2px solid #3b82f6; // blue-500
+    outline-offset: 2px;
+  }
+
+  // Custom scrollbar for better UX
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+
+    &:hover {
+      background: #555;
+    }
+  }
+}
+
+// Animation for form validation
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.shake {
+  animation: shake 0.5s;
+}
+
+// Signature pad styling
+.signature-saved {
+  border: 2px solid #4caf50 !important;
+  background-color: #f1f8e9 !important;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+  
+  canvas {
+    border-radius: 2px;
+  }
+}
+
+.signature-cleared {
+  border: 2px dashed #ff9800 !important;
+  background-color: #fff3e0 !important;
+  border-radius: 4px;
+  
+  canvas {
+    border-radius: 2px;
+  }
+}
